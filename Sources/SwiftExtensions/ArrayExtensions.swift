@@ -116,6 +116,19 @@ extension Array {
         if indices.contains(index) { return remove(at: index) }
         return nil
     }
+    
+    /// Repeat popLast() for k times, which is similar to remove last k elements and return them.
+    /// - Parameter k: Number of last elements
+    /// - Returns: Removed elements
+    public mutating func popLast(_ k: Int) -> [Element] {
+        var returningArray = [Element]()
+        for _ in 0..<k {
+            if let last = self.popLast() {
+                returningArray.append(last)
+            }
+        }
+        return returningArray
+    }
 }
 
 
@@ -186,5 +199,13 @@ extension Array where Element: Hashable {
         for index in indexes.sorted(by: >) {
             self.remove(safe: index)
         }
+    }
+    
+    public func dictionize<Key: Hashable>(with selectKey: (Element) -> Key) -> [Key: Element] {
+        var dict = [Key:Element]()
+        for element in self {
+            dict[selectKey(element)] = element
+        }
+        return dict
     }
 }
