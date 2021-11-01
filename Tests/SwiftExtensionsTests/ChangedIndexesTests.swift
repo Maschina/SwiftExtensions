@@ -5,7 +5,7 @@ final class ChangedIndexesTests: XCTestCase {
     func testLengthIncrease() {
         let previous = [1, 2, 3, 4, 5]
         let current = [1, 2, 3, 4, 5, 6, 7]
-        
+		
         let inserts = current.changedIndexes(previous: previous).inserts
         
         XCTAssertEqual([5, 6], inserts)
@@ -31,7 +31,7 @@ final class ChangedIndexesTests: XCTestCase {
     
     func testMultiChanges() {
         let previous = [3, 2, 1]
-        let current = [2, 2, 1, 4, 3]
+        let current = [2, 2, 1, 4, 9]
         
         let changes = current.changedIndexes(previous: previous).changes
         let inserts = current.changedIndexes(previous: previous).inserts
