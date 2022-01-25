@@ -30,5 +30,18 @@ extension String {
             return self.prefix(limit) + leader
         }
     }
+	
+	@available(macOS 10.12, *)
+	public func dateFormatterISO8601() -> Date {
+		let formatter = ISO8601DateFormatter()
+		return formatter.date(from: (self) + "Z") ?? Date()
+	}
 }
 
+extension Optional where Wrapped == String {
+	@available(macOS 10.12, *)
+	public func dateFormatterISO8601() -> Date? {
+		let formatter = ISO8601DateFormatter()
+		return formatter.date(from: (self ?? "") + "Z")
+	}
+}

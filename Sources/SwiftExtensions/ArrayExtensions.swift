@@ -4,6 +4,11 @@ extension Collection where Indices.Iterator.Element == Index {
     public subscript(safe index: Index) -> Iterator.Element? {
         return indices.contains(index) ? self[index] : nil
     }
+	
+	public subscript(optional index: Index?) -> Iterator.Element? {
+		guard let index = index else { return nil }
+		return indices.contains(index) ? self[index] : nil
+	}
 }
 
 
@@ -17,6 +22,17 @@ extension Array where Element: Equatable {
             return (true, element)
         }
     }
+	
+	@discardableResult
+	public mutating func appendOrOverwrite(element: Element) -> (overwritten: Bool, memberAfterAppend: Element) {
+		if let index = firstIndex(of: element) {
+			self[index] = element
+			return (true, self[index])
+		} else {
+			append(element)
+			return (false, element)
+		}
+	}
     
     public func appended(ifNew element: Element) -> [Element] {
         if contains(element) {
@@ -129,6 +145,15 @@ extension Array {
         }
         return returningArray
     }
+	
+	/// Split array into chunks of a specified size
+	/// - Parameter size: chunk size
+	/// - Returns: array of chunks
+	public func chunked(into size: Int) -> [[Element]] {
+		return stride(from: 0, to: count, by: size).map {
+			Array(self[$0 ..< Swift.min($0 + size, count)])
+		}
+	}
 }
 
 
@@ -208,4 +233,47 @@ extension Array where Element: Hashable {
         }
         return dict
     }
+    
+    public func overlap(with: [Element]) -> IndexSet {
+        let indices = self.enumerated().compactMap({ (index, element) in with.contains(element) ? index : nil })
+        let elements = indices.map({ IndexSet.Element($0) })
+        return IndexSet(elements)
+    }
+}
+
+
+extension Sequence {
+	@available(macOS 10.15.0, *)
+	public func asyncMap<T>(_ transform: (Element) async throws -> T) async throws -> [T] {
+		var values = [T]()
+		
+		for element in self {
+			try Task.checkCancellation()
+			try await values.append(transform(element))
+		}
+		
+		return values
+	}
+	
+	@available(macOS 10.15.0, *)
+	public func asyncCompactMap<T>(_ transform: (Element) async throws -> T?) async throws -> [T] {
+		var values = [T]()
+		
+		for element in self {
+			try Task.checkCancellation()
+			if let element = try await transform(element) {
+				values.append(element)
+			}
+		}
+		
+		return values
+	}
+	
+	@available(macOS 10.15.0, *)
+	public func asyncForEach(_ operation: (Element) async throws -> Void) async throws {
+		for element in self {
+			try Task.checkCancellation()
+			try await operation(element)
+		}
+	}
 }
