@@ -23,54 +23,6 @@ extension CGVector {
     public init(_ basis: CGPoint) {
         self.init(dx: basis.x, dy: basis.y)
     }
-    
-    public static func + (lhs: CGVector, rhs: CGFloat) -> CGVector {
-        return CGVector(dx: lhs.dx + rhs, dy: lhs.dy + rhs)
-    }
-    
-    public static func + (lhs: CGVector, rhs: CGVector) -> CGVector {
-        return CGVector(dx: lhs.dx + rhs.dx, dy: lhs.dy + rhs.dy)
-    }
-    
-    public static func - (lhs: CGVector, rhs: CGFloat) -> CGVector {
-        return CGVector(dx: lhs.dx - rhs, dy: lhs.dy - rhs)
-    }
-    
-    public static func - (lhs: CGVector, rhs: CGVector) -> CGVector {
-        return CGVector(dx: lhs.dx - rhs.dx, dy: lhs.dy - rhs.dy)
-    }
-    
-    public static func * (lhs: CGVector, rhs: CGFloat) -> CGVector {
-        return CGVector(dx: lhs.dx * rhs, dy: lhs.dy * rhs)
-    }
-    
-    public static func / (lhs: CGVector, rhs: CGFloat) -> CGVector {
-        return CGVector(dx: lhs.dx / rhs, dy: lhs.dy / rhs)
-    }
-    
-    public static func += (lhs: inout CGVector, rhs: CGFloat)  {
-        lhs = lhs + rhs
-    }
-    
-    public static func += (lhs: inout CGVector, rhs: CGVector)  {
-        lhs = lhs + rhs
-    }
-    
-    public static func -= (lhs: inout CGVector, rhs: CGFloat)  {
-        lhs = lhs - rhs
-    }
-    
-    public static func -= (lhs: inout CGVector, rhs: CGVector)  {
-        lhs = lhs - rhs
-    }
-    
-    public static func *= (lhs: inout CGVector, rhs: CGFloat)  {
-        lhs = lhs * rhs
-    }
-    
-    public static func /= (lhs: inout CGVector, rhs: CGFloat)  {
-        lhs = lhs / rhs
-    }
 }
 
 extension CGFloat {
