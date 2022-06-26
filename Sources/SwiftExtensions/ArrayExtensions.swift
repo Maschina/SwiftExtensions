@@ -55,6 +55,14 @@ extension Array where Element: Equatable {
         result.append(contentsOf: newElements)
         return result
     }
+	
+	public func filterOut(elements removeElements: [Element]) -> [Element] {
+		var removeElements = removeElements
+		guard !removeElements.isEmpty else { return self }
+		let removedElement = removeElements.removeFirst()
+		let result = self.filter({ $0 != removedElement })
+		return result.filterOut(elements: removeElements)
+	}
 }
 
 
@@ -181,21 +189,21 @@ extension Array where Element: Equatable {
         }
         self = result
     }
-    
-    /// Compares the array with a previous version and returns a index path to indicate the differences
-    /// - Parameter previous: Previous version of the current array
-    /// - Returns: Index path to indicate the differences
-    public func changedIndexes(previous: [Element]) -> (changes: IndexPath, inserts: IndexPath, deletes: IndexPath) {
-        let changes = zip(self, previous).enumerated().reduce([]) { $1.element.0 == $1.element.1 ? $0 : $0 + [$1.offset] }
-        let lenChanges = IndexPath(indexes: Swift.min(self.count, previous.count)..<Swift.max(self.count, previous.count))
-        let inserts = self.count > previous.count ? lenChanges : []
-        let deletes = self.count < previous.count ? lenChanges : []
-        return (changes: changes, inserts: inserts, deletes: deletes)
-    }
 }
 
 
 extension Array where Element: Hashable {
+	/// Compares the array with a previous version and returns a index path to indicate the differences
+	/// - Parameter previous: Previous version of the current array
+	/// - Returns: Index path to indicate the differences
+	public func changedIndexes(previous: [Element]) -> (changes: IndexPath, inserts: IndexPath, deletes: IndexPath) {
+		let changes = zip(self, previous).enumerated().reduce([]) { $1.element.0 == $1.element.1 ? $0 : $0 + [$1.offset] }
+		let lenChanges = IndexPath(indexes: Swift.min(self.count, previous.count)..<Swift.max(self.count, previous.count))
+		let inserts = self.count > previous.count ? lenChanges : []
+		let deletes = self.count < previous.count ? lenChanges : []
+		return (changes: changes, inserts: inserts, deletes: deletes)
+	}
+	
     public func removingDuplicates() -> [Element] {
         var addedDict = [Element: Bool]()
         return filter {
@@ -239,10 +247,26 @@ extension Array where Element: Hashable {
         let elements = indices.map({ IndexSet.Element($0) })
         return IndexSet(elements)
     }
+	
+//	public func overlap(with: [Element]) -> [Int] {
+//		self.enumerated().compactMap({ (index, element) in with.contains(element) ? index : nil })
+//	}
 }
 
 
 extension Sequence {
+	@available(macOS 10.15.0, *)
+	public func asyncMap<T>(_ transform: (Element) async -> T) async throws -> [T] {
+		var values = [T]()
+		
+		for element in self {
+			try Task.checkCancellation()
+			await values.append(transform(element))
+		}
+		
+		return values
+	}
+	
 	@available(macOS 10.15.0, *)
 	public func asyncMap<T>(_ transform: (Element) async throws -> T) async throws -> [T] {
 		var values = [T]()
@@ -270,10 +294,35 @@ extension Sequence {
 	}
 	
 	@available(macOS 10.15.0, *)
+	public func asyncContains(where validate: (Element) async throws -> Bool) async throws -> Bool {
+		for element in self {
+			try Task.checkCancellation()
+			if try await validate(element) {
+				return true
+			}
+		}
+		return false
+	}
+	
+	@available(macOS 10.15.0, *)
 	public func asyncForEach(_ operation: (Element) async throws -> Void) async throws {
 		for element in self {
 			try Task.checkCancellation()
 			try await operation(element)
 		}
+	}
+	
+	@available(macOS 10.15.0, *)
+	public func asyncFilter(_ validate: (Element) async throws -> Bool) async throws -> [Element] {
+		var values = [Element]()
+		
+		for element in self {
+			try Task.checkCancellation()
+			if try await validate(element) {
+				values.append(element)
+			}
+		}
+		
+		return values
 	}
 }

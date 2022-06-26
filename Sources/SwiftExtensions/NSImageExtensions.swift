@@ -8,7 +8,7 @@ extension NSImage {
 		
 		// Text
 		let text: String? = { if let textString = textString { return textString } else { return nil } }()
-		let textFont = font ?? NSFont.systemFont(ofSize: NSFont.systemFontSize, weight: NSFont.Weight.light)
+		let textFont = font ?? NSFont.systemFont(ofSize: NSFont.systemFontSize, weight: NSFont.Weight.regular)
 		let textStyle = NSMutableParagraphStyle.default.mutableCopy() as! NSMutableParagraphStyle
 		let textColor = highlighted ? NSColor.selectedMenuItemTextColor : NSColor.controlTextColor
 		let textFontAttributes: [NSAttributedString.Key : Any] = [

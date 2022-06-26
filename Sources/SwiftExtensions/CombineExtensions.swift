@@ -78,7 +78,6 @@ public extension Publisher {
 				await receiveValue(value)
 			}
 		}
-
 	}
 	
 	/// Attaches a concurrent Task-driven subscriber with closure-based behavior.
@@ -121,5 +120,23 @@ public extension Publisher where Self.Failure == Never {
 				await receiveValue(value)
 			}
 		}
+	}
+}
+
+public struct PublisherChange<Value> {
+	public var old: Value?
+	public var new: Value
+}
+
+@available(macOS 10.15, *)
+public extension Publisher {
+	func change() -> Publishers.Map<Publishers.Scan<Self, (Optional<Self.Output>, Optional<Self.Output>)>, PublisherChange<Self.Output>> {
+		return self
+			.scan((Output?.none, Output?.none)) { (state, new) in
+				(state.1, .some(new))
+			}
+			.map { (old, new) in
+				PublisherChange(old: old, new: new!)
+			}
 	}
 }
