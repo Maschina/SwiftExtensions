@@ -58,3 +58,18 @@ extension Array where Element == LocalizedStringKey {
 		return result
 	}
 }
+
+@available(macOS 11.0, *)
+extension LocalizedStringKey.StringInterpolation {
+	public mutating func appendInterpolation(_ input: Int, format formatter: NumberFormatter) {
+		if let result = formatter.string(from: input as NSNumber) {
+			appendLiteral(result)
+		}
+	}
+	
+	public mutating func appendInterpolation(_ input: Double, format formatter: NumberFormatter) {
+		if let result = formatter.string(from: input as NSNumber) {
+			appendLiteral(result)
+		}
+	}
+}

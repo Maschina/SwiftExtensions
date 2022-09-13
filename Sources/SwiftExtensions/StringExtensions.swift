@@ -49,6 +49,15 @@ extension String {
 	}
 }
 
+
+extension String.StringInterpolation {
+	public mutating func appendInterpolation(_ number: Int, format: NumberFormatter) {
+		if let result = format.string(from: number as NSNumber) {
+			appendLiteral(result)
+		}
+	}
+}
+
 //extension Optional where Wrapped == String {
 //	@available(macOS 10.12, *)
 //	public func dateFormatterISO8601() -> Date? {

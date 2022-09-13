@@ -63,10 +63,18 @@ extension Array where Element: Equatable {
 		let result = self.filter({ $0 != removedElement })
 		return result.filterOut(elements: removeElements)
 	}
+	
+	public func satisfy(array: [Element]) -> Bool {
+		return self.allSatisfy(array.contains)
+	}
 }
 
 
 extension Array {
+	public var isNotEmpty: Bool {
+		!self.isEmpty
+	}
+	
     /// Creates strings out of every element based on a given stringifier function.
     /// - Parameter stringifier: Function to stringify the array element
     public func stringify(stringifier: @escaping (_ collection: Element) -> String) -> [String] {
@@ -205,15 +213,14 @@ extension Array where Element: Hashable {
 	}
 	
     public func removingDuplicates() -> [Element] {
-        var addedDict = [Element: Bool]()
-        return filter {
-            addedDict.updateValue(true, forKey: $0) == nil
-        }
+		var array = self
+		array.removeDuplicates()
+        return array
     }
-    
-    public mutating func removeDuplicates() {
-        self = self.removingDuplicates()
-    }
+	
+	public func elementsEqual() -> Bool {
+		self.dropFirst().allSatisfy({ $0 == self.first })
+	}
     
     public func uniqueElements() -> (uniques: [Element], filtered: [Int]) {
         var uniques = [Element]()
