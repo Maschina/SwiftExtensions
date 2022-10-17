@@ -15,7 +15,9 @@ public extension URLSession {
 			Task { await sessionDataTask.cancel() }
 		} operation: {
 			try await withCheckedThrowingContinuation { continuation in
-				Task {
+				Task { [weak self] in
+					guard let self else { return }
+					
 					await sessionDataTask.start(self.dataTask(with: request) { data, response, error in
 						guard let data = data, let response = response else {
 							let error = error ?? URLError(.badServerResponse)
