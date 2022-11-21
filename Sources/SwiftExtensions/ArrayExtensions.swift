@@ -262,6 +262,7 @@ extension Array where Element: Hashable {
 
 
 extension Sequence {
+	@available(iOS 13.0, *)
 	@available(macOS 10.15.0, *)
 	public func asyncMap<T>(_ transform: (Element) async -> T) async throws -> [T] {
 		var values = [T]()
@@ -274,6 +275,7 @@ extension Sequence {
 		return values
 	}
 	
+	@available(iOS 13.0, *)
 	@available(macOS 10.15.0, *)
 	public func asyncMap<T>(_ transform: (Element) async throws -> T) async throws -> [T] {
 		var values = [T]()
@@ -286,6 +288,7 @@ extension Sequence {
 		return values
 	}
 	
+	@available(iOS 13.0, *)
 	@available(macOS 10.15.0, *)
 	public func asyncCompactMap<T>(_ transform: (Element) async throws -> T?) async throws -> [T] {
 		var values = [T]()
@@ -300,6 +303,7 @@ extension Sequence {
 		return values
 	}
 	
+	@available(iOS 13.0, *)
 	@available(macOS 10.15.0, *)
 	public func asyncContains(where validate: (Element) async throws -> Bool) async throws -> Bool {
 		for element in self {
@@ -311,6 +315,7 @@ extension Sequence {
 		return false
 	}
 	
+	@available(iOS 13.0, *)
 	@available(macOS 10.15.0, *)
 	public func asyncForEach(_ operation: (Element) async throws -> Void) async throws {
 		for element in self {
@@ -319,6 +324,7 @@ extension Sequence {
 		}
 	}
 	
+	@available(iOS 13.0, *)
 	@available(macOS 10.15.0, *)
 	public func asyncFilter(_ validate: (Element) async throws -> Bool) async throws -> [Element] {
 		var values = [Element]()

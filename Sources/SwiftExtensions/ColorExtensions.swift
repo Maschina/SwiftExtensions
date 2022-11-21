@@ -1,12 +1,19 @@
 import Foundation
+#if os(iOS)
+import UIKit.UIColor
+public typealias MultiplatformColor = UIColor
+#elseif os(macOS)
 import AppKit.NSColor
+public typealias MultiplatformColor = NSColor
+#endif
 
 /**
  Credits go to Jathu Satkunarajah - August 2015 - Toronto (https://github.com/jathu)
  He provided the code for the distance measurement: https://github.com/jathu/sweetercolor/blob/master/Sweetercolor/Sweetercolor.swift
  */
 
-extension NSColor {
+extension MultiplatformColor {
+#if os(macOS)
 	/// Get the red, green, blue and alpha values.
 	public var rgbaComponents: (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
 		var R: CGFloat = 0
@@ -17,6 +24,7 @@ extension NSColor {
 		colorRGBSpace.getRed(&R, green: &G, blue: &B, alpha: &A)
 		return (R,G,B,A)
 	}
+#endif
 	
     /// Get the red, green, blue and alpha values.
     var RGBA: [CGFloat] {
@@ -87,7 +95,7 @@ extension NSColor {
     /// - Parameter color: Color to compare
     /// - Returns: Representing the deltaE
     /// - seealso: https://en.wikipedia.org/wiki/Color_difference#CIE94
-    func compareCIE94(color: NSColor) -> CGFloat {
+	func compareCIE94(color: MultiplatformColor) -> CGFloat {
         let k_L:CGFloat = 1
         let k_C:CGFloat = 1
         let k_H:CGFloat = 1
@@ -127,7 +135,7 @@ extension NSColor {
     /// - Parameter color: color to compare
     /// - Returns: representing the deltaE
     /// - seealso: CIEDE2000, Sharma 2004 -> http://www.ece.rochester.edu/~gsharma/ciede2000/ciede2000noteCRNA.pdf
-    func compareCIEDE2000(color: NSColor) -> CGFloat {
+    func compareCIEDE2000(color: MultiplatformColor) -> CGFloat {
         func rad2deg(r: CGFloat) -> CGFloat {
             return r * CGFloat(180/Double.pi)
         }
@@ -219,7 +227,7 @@ extension NSColor {
     ///
     /// A low ratio implies there is a smaller contrast between the two colors.
     /// A higher ratio implies there is a larger contrast between the two colors.
-    public func contrastRatio(with color: NSColor) -> CGFloat {
+    public func contrastRatio(with color: MultiplatformColor) -> CGFloat {
         let L1 = self.luminance
         let L2 = color.luminance
         
@@ -236,15 +244,15 @@ extension NSColor {
     ///   - strict: boolean, if true a stricter judgment of contrast ration will be used. Optional. Default: false
     /// - Returns: a boolean, true of the two colors are contrasting, false otherwise.
     /// - seealso: http://www.w3.org/TR/2008/REC-WCAG20-20081211/#visual-audio-contrast-contrast
-    public func isContrasting(with color: NSColor, strict: Bool = false) -> Bool {
+    public func isContrasting(with color: MultiplatformColor, strict: Bool = false) -> Bool {
         let ratio = self.contrastRatio(with: color)
         return strict ? (7 <= ratio) : (4.5 < ratio)
     }
 	
-	public var inverted: NSColor {
+	public var inverted: MultiplatformColor {
 		var r: CGFloat = 0.0, g: CGFloat = 0.0, b: CGFloat = 0.0, a: CGFloat = 0.0
 		self.getRed(&r, green: &g, blue: &b, alpha: &a)
-		return NSColor(red: (1 - r), green: (1 - g), blue: (1 - b), alpha: a) // Assuming you want the same alpha value.
+		return MultiplatformColor(red: (1 - r), green: (1 - g), blue: (1 - b), alpha: a) // Assuming you want the same alpha value.
 	}
 	
 	public var hue: CGFloat

@@ -1,12 +1,14 @@
 import Foundation
 import Combine
 
-@available(OSX 10.15, *)
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
 extension Publisher {
     public var erased: AnyPublisher<Output, Failure> { eraseToAnyPublisher() }
 }
 
-@available(OSX 10.15, *)
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
 public extension Publisher {
     /// Creates a new publisher which will upon failure retry the upstream publisher a provided number of times, with the provided delay between retry attempts.
     ///
@@ -51,6 +53,7 @@ public extension Publisher {
     }
 }
 
+@available(iOS 13.0, *)
 @available(macOS 10.15, *)
 public extension Publisher {
 	/// Freely call any non-throwing async function within a Combine pipeline
@@ -109,6 +112,7 @@ public extension Publisher {
 	}
 }
 
+@available(iOS 13.0, *)
 @available(macOS 10.15, *)
 public extension Publisher where Self.Failure == Never {
 	/// Attaches a concurrent Task-driven subscriber with closure-based behavior to a publisher that never fails.
@@ -128,6 +132,7 @@ public struct PublisherChange<Value> {
 	public var new: Value
 }
 
+@available(iOS 13.0, *)
 @available(macOS 10.15, *)
 public extension Publisher {
 	func change() -> Publishers.Map<Publishers.Scan<Self, (Optional<Self.Output>, Optional<Self.Output>)>, PublisherChange<Self.Output>> {

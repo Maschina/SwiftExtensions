@@ -1,5 +1,6 @@
 import Foundation
 
+@available(iOS 13.0, *)
 @available(macOS 10.15, *)
 extension Task where Success == Never, Failure == Never {
 	public static func sleep(seconds: Int) async throws {

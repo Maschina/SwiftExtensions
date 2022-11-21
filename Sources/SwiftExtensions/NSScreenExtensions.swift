@@ -1,3 +1,4 @@
+#if os(macOS)
 import AppKit
 
 extension NSScreen {
@@ -17,3 +18,4 @@ extension NSScreen {
 		return CFUUIDCreateString(nil, uuid) as String
 	}
 }
+#endif

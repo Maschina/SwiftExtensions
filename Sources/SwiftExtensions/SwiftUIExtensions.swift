@@ -1,5 +1,7 @@
 import SwiftUI
 
+#if os(macOS)
+
 @available(macOS 10.15, *)
 extension View {
 	public func renderAsImage() -> NSImage? {
@@ -16,6 +18,9 @@ private class NoInsetHostingView<V>: NSHostingView<V> where V: View {
 	}
 }
 
+#endif
+
+@available(iOS 13.0, *)
 @available(macOS 10.15, *)
 extension LocalizedStringKey {
 	var stringKey: String? {
@@ -28,6 +33,7 @@ extension LocalizedStringKey {
 	}
 }
 
+@available(iOS 13.0, *)
 @available(macOS 10.15, *)
 extension Array where Element == LocalizedStringKey {
 	
@@ -59,6 +65,7 @@ extension Array where Element == LocalizedStringKey {
 	}
 }
 
+@available(iOS 13.0, *)
 @available(macOS 11.0, *)
 extension LocalizedStringKey.StringInterpolation {
 	public mutating func appendInterpolation(_ input: Int, format formatter: NumberFormatter) {

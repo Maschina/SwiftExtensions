@@ -1,4 +1,5 @@
-import Cocoa
+#if os(macOS)
+import AppKit
 
 extension NSImage {
 	@available(macOS 10.11, *)
@@ -135,3 +136,4 @@ extension NSImage {
 		return image
 	}
 }
+#endif

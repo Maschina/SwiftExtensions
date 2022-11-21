@@ -1,4 +1,5 @@
-import Cocoa
+#if os(macOS)
+import AppKit
 
 public extension NSView {
 	func bitmapImage() -> NSImage? {
@@ -12,3 +13,5 @@ public extension NSView {
 		return NSImage(cgImage: cgImage, size: bounds.size)
 	}
 }
+
+#endif
