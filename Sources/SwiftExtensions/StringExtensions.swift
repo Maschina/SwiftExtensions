@@ -47,6 +47,20 @@ extension String {
 		
 		return localizedString
 	}
+	
+	
+	public func fuzzyMatch(_ needle: String, casesensitive: Bool = true) -> Bool {
+		if needle.isEmpty { return true }
+		var remainder = needle[...]
+		for char in self {
+			let match = casesensitive ? (char == remainder[remainder.startIndex]) : (char.uppercased() == remainder[remainder.startIndex].uppercased())
+			if match {
+				remainder.removeFirst()
+				if remainder.isEmpty { return true }
+			}
+		}
+		return false
+	}
 }
 
 
