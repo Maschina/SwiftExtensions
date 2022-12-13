@@ -30,6 +30,10 @@ extension String {
         }
     }
 	
+	public func removeNewlines() -> String {
+		return self.components(separatedBy: .newlines).joined()
+	}
+	
 	@available(macOS 10.12, *)
 	public func dateFormatterISO8601() -> Date? {
 		guard self != "none" else { return nil }
