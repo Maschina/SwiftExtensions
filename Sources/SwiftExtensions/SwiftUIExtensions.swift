@@ -87,6 +87,14 @@ extension Shape {
 			.stroke(strokeStyle, lineWidth: lineWidth)
 			.background(self.fill(fillStyle))
 	}
+	
+	/// fills and strokes a shape
+	public func fill<S: ShapeStyle>(_ fillContent: S, stroke: StrokeStyle, strokeColor: S) -> some View {
+		ZStack {
+			self.fill(fillContent)
+			self.stroke(strokeColor, style: stroke)
+		}
+	}
 }
 
 extension InsettableShape {

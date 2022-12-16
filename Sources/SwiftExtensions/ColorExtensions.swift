@@ -6,6 +6,7 @@ public typealias MultiplatformColor = UIColor
 import AppKit.NSColor
 public typealias MultiplatformColor = NSColor
 #endif
+import SwiftUI
 
 /**
  Credits go to Jathu Satkunarajah - August 2015 - Toronto (https://github.com/jathu)
@@ -267,5 +268,15 @@ extension MultiplatformColor {
 					brightness: &brightness,
 					alpha: &alpha)
 		return hue
+	}
+}
+
+
+extension Color {
+	public init(hex: Int, opacity: Double = 1.0) {
+		let red = Double((hex & 0xff0000) >> 16) / 255.0
+		let green = Double((hex & 0xff00) >> 8) / 255.0
+		let blue = Double((hex & 0xff) >> 0) / 255.0
+		self.init(.sRGB, red: red, green: green, blue: blue, opacity: opacity)
 	}
 }
