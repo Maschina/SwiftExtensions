@@ -1,5 +1,75 @@
 import SwiftUI
 
+extension View {
+	/// Conditionally apply modifiers to views
+	/// - Parameters:
+	///   - condition: Condition when to apply
+	///   - transform: Modifier
+	/// - Returns: View
+	///
+	/// - Example: *Apply padding, if X*
+	/// ~~~
+	/// .if(X) { $0.padding(8) }
+	/// ~~~
+	@ViewBuilder
+	public func `if`<Transform: View>(
+		_ condition: Bool,
+		transform: (Self) -> Transform
+	) -> some View {
+		if condition {
+			transform(self)
+		} else {
+			self
+		}
+	}
+	
+	/// Conditionally apply modifiers to view including else block
+	/// - Parameters:
+	///   - condition: Condition when to apply
+	///   - ifTransform: Modifier if true
+	///   - elseTransform: Modifier if false
+	/// - Returns: View
+	///
+	/// - Example: *Apply padding, if X, else apply blue background color
+	/// ~~~
+	/// .if(X) { $0.padding(8) } else: { $0.background(Color.blue) }
+	/// ~~~
+	@ViewBuilder
+	public func `if`<TrueContent: View, FalseContent: View>(
+		_ condition: Bool,
+		if ifTransform: (Self) -> TrueContent,
+		else elseTransform: (Self) -> FalseContent
+	) -> some View {
+		if condition {
+			ifTransform(self)
+		} else {
+			elseTransform(self)
+		}
+	}
+	
+	/// Conditionally apply modifier if value is not nil
+	/// - Parameters:
+	///   - value: Optional value
+	///   - transform: Modifier
+	/// - Returns: View
+	///
+	/// - Example: *Apply give foreground color, if not nil*
+	/// ~~~
+	/// .ifLet(optionalColor) { $0.foregroundColor($1) }
+	/// ~~~
+	@ViewBuilder
+	public func ifLet<V, Transform: View>(
+		_ value: V?,
+		transform: (Self, V) -> Transform
+	) -> some View {
+		if let value = value {
+			transform(self, value)
+		} else {
+			self
+		}
+	}
+}
+
 #if os(macOS)
 
 @available(macOS 10.15, *)
@@ -82,16 +152,29 @@ extension LocalizedStringKey.StringInterpolation {
 }
 
 extension Shape {
-	public func fill<Fill: ShapeStyle, Stroke: ShapeStyle>(_ fillStyle: Fill, strokeBorder strokeStyle: Stroke, lineWidth: Double = 1) -> some View {
+	public func fill<Fill: ShapeStyle, Stroke: ShapeStyle>(_ fillStyle: Fill, strokeBorder strokeStyle: Stroke, lineWidth: Double = 1, shadowRadius: CGFloat? = nil, shadowColor: Color = Color(.sRGBLinear, white: 0, opacity: 0.33), shadowX: CGFloat = 0, shadowY: CGFloat = 0) -> some View {
 		self
 			.stroke(strokeStyle, lineWidth: lineWidth)
-			.background(self.fill(fillStyle))
+			.background(
+				self
+					.fill(fillStyle)
+					.ifLet(shadowRadius, transform: { shape, radius in
+						shape
+							.shadow(color: shadowColor, radius: radius, x: shadowX, y: shadowY)
+					})
+			)
 	}
 	
 	/// fills and strokes a shape
-	public func fill<S: ShapeStyle>(_ fillContent: S, stroke: StrokeStyle, strokeColor: S) -> some View {
+	public func fill<S: ShapeStyle>(_ fillContent: S, stroke: StrokeStyle, strokeColor: S, shadowRadius: CGFloat? = nil, shadowColor: Color = Color(.sRGBLinear, white: 0, opacity: 0.33), shadowX: CGFloat = 0, shadowY: CGFloat = 0) -> some View {
 		ZStack {
-			self.fill(fillContent)
+			self
+				.fill(fillContent)
+				.ifLet(shadowRadius, transform: { shape, radius in
+					shape
+						.shadow(color: shadowColor, radius: radius, x: shadowX, y: shadowY)
+				})
+			
 			self.stroke(strokeColor, style: stroke)
 		}
 	}

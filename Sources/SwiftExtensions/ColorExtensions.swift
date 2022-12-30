@@ -272,6 +272,24 @@ extension MultiplatformColor {
 }
 
 
+#if os(iOS)
+extension UIColor {
+	public var darker: UIColor {
+		var h: CGFloat = 0, s: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+		
+		guard self.getHue(&h, saturation: &s, brightness: &b, alpha: &a) else {
+			print("** some problem demuxing the color")
+			return .gray
+		}
+		
+		let nudged = b * 0.9
+		
+		return UIColor(hue: h, saturation: s, brightness: nudged, alpha: a)
+	}
+}
+#endif
+
+
 extension Color {
 	public init(hex: Int, opacity: Double = 1.0) {
 		let red = Double((hex & 0xff0000) >> 16) / 255.0
