@@ -187,3 +187,33 @@ extension InsettableShape {
 			.background(self.fill(fillStyle))
 	}
 }
+
+extension Color {
+	/// This color is either black or white, whichever is more accessible when viewed against the scrum color.
+	public var accessibleFontColor: Color {
+		var red: CGFloat = 0
+		var green: CGFloat = 0
+		var blue: CGFloat = 0
+#if os(iOS)
+		UIColor(self).getRed(&red, green: &green, blue: &blue, alpha: nil)
+#elseif os(macOS)
+		NSColor(self).getRed(&red, green: &green, blue: &blue, alpha: nil)
+#endif
+		return isLightColor(red: red, green: green, blue: blue) ? .black : .white
+	}
+	
+	private func isLightColor(red: CGFloat, green: CGFloat, blue: CGFloat) -> Bool {
+		let lightRed = red > 0.65
+		let lightGreen = green > 0.65
+		let lightBlue = blue > 0.65
+		
+		let lightness = [lightRed, lightGreen, lightBlue].reduce(0) { $1 ? $0 + 1 : $0 }
+		return lightness >= 2
+	}
+}
+
+extension Font {
+	static public func roundedFont(_ style: Font.TextStyle) -> Font {
+		Font.system(style, design: .rounded)
+	}
+}

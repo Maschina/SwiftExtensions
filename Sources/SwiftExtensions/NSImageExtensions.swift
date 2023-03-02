@@ -1,5 +1,6 @@
 #if os(macOS)
 import AppKit
+import UniformTypeIdentifiers
 
 extension NSImage {
 	@available(macOS 10.11, *)
@@ -121,6 +122,37 @@ extension NSImage {
 		return img
 	}
 	
+	public func resized(to newSize: NSSize, keepAspectRatio: Bool = true) -> NSImage? {
+		let currentSize = self.size
+		
+		var newSize = newSize
+		if keepAspectRatio {
+			let ratioX = newSize.width / currentSize.width
+			let ratioY = newSize.height / currentSize.height
+			let ratio = ratioX < ratioY ? ratioX : ratioY
+			newSize.width = currentSize.width * ratio
+			newSize.height = currentSize.height * ratio
+		}
+		
+		if let bitmapRep = NSBitmapImageRep(
+			bitmapDataPlanes: nil, pixelsWide: Int(newSize.width), pixelsHigh: Int(newSize.height),
+			bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+			colorSpaceName: .calibratedRGB, bytesPerRow: 0, bitsPerPixel: 0
+		) {
+			bitmapRep.size = newSize
+			NSGraphicsContext.saveGraphicsState()
+			NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: bitmapRep)
+			draw(in: NSRect(x: 0, y: 0, width: newSize.width, height: newSize.height), from: .zero, operation: .copy, fraction: 1.0)
+			NSGraphicsContext.restoreGraphicsState()
+			
+			let resizedImage = NSImage(size: newSize)
+			resizedImage.addRepresentation(bitmapRep)
+			return resizedImage
+		}
+		
+		return nil
+	}
+	
 	public func tint(color: NSColor) -> NSImage {
 		let image = self.copy() as! NSImage
 		image.isTemplate = false
@@ -134,6 +166,21 @@ extension NSImage {
 		image.unlockFocus()
 		
 		return image
+	}
+}
+
+extension NSItemProvider {
+	@available(macOS 13.0, *)
+	public func loadDataRepresentation(for contentType: UTType) async throws -> Data? {
+		try await withCheckedThrowingContinuation { [weak self] continuation in
+			_ = self?.loadDataRepresentation(for: contentType, completionHandler: { data, error in
+				if let error {
+					continuation.resume(throwing: error)
+					return
+				}
+				continuation.resume(returning: data)
+			})
+		}
 	}
 }
 #endif

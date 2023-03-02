@@ -5,12 +5,27 @@ extension Collection where Indices.Iterator.Element == Index {
         return indices.contains(index) ? self[index] : nil
     }
 	
+	public subscript(safe range: Range<Self.Index>) -> Self.SubSequence? {
+		guard !self.isEmpty else { return nil }
+		let lowerBound = Swift.max(self.startIndex, range.lowerBound)
+		let upperBound = Swift.min(index(self.endIndex, offsetBy: -1), range.upperBound)
+		guard lowerBound < upperBound else { return nil }
+		return self[lowerBound ..< upperBound]
+	}
+	
+	public subscript(safe range: ClosedRange<Self.Index>) -> Self.SubSequence? {
+		guard !self.isEmpty else { return nil }
+		let lowerBound = Swift.max(self.startIndex, range.lowerBound)
+		let upperBound = Swift.min(self.endIndex, index(range.upperBound, offsetBy: 1))
+		guard lowerBound < upperBound else { return nil }
+		return self[lowerBound ..< upperBound]
+	}
+	
 	public subscript(optional index: Index?) -> Iterator.Element? {
 		guard let index = index else { return nil }
 		return indices.contains(index) ? self[index] : nil
 	}
 }
-
 
 extension Array where Element: Equatable {
     @discardableResult
