@@ -1,8 +1,20 @@
 #if os(macOS)
 import AppKit
+#else
+import UIKit
+#endif
+
 import UniformTypeIdentifiers
 
-extension NSImage {
+#if os(macOS)
+typealias PlatformImage = NSImage
+#else
+typealias PlatformImage = UIImage
+#endif
+
+
+extension PlatformImage {
+#if os(macOS)
 	@available(macOS 10.11, *)
 	public convenience init?(gradient: [NSColor], size: NSSize, text textString: String, font: NSFont? = nil, highlighted: Bool) {
 		// Gradient
@@ -167,10 +179,12 @@ extension NSImage {
 		
 		return image
 	}
+#endif
 }
 
 extension NSItemProvider {
 	@available(macOS 13.0, *)
+	@available(iOS 16.0, *)
 	public func loadDataRepresentation(for contentType: UTType) async throws -> Data? {
 		try await withCheckedThrowingContinuation { [weak self] continuation in
 			_ = self?.loadDataRepresentation(for: contentType, completionHandler: { data, error in
@@ -183,4 +197,3 @@ extension NSItemProvider {
 		}
 	}
 }
-#endif
