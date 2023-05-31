@@ -1,6 +1,27 @@
 import Foundation
 
 public extension Date {
+	init(month: Int, day: Int, year: Int, hour: Int = 0, minute: Int = 0, second: Int = 0) {
+		var dateComponents = DateComponents()
+		dateComponents.month = month
+		dateComponents.day = day
+		dateComponents.year = year
+		dateComponents.hour = hour
+		dateComponents.minute = minute
+		dateComponents.second = second
+		dateComponents.timeZone = .current
+		dateComponents.calendar = .current
+		self = Calendar.current.date(from: dateComponents) ?? Date()
+	}
+	
+	func localDate() -> Date {
+		let timeZoneOffset = Double(TimeZone.current.secondsFromGMT(for: self))
+		guard let localDate = Calendar.current.date(byAdding: .second, value: Int(timeZoneOffset), to: self) else {
+			return self
+		}
+		return localDate
+	}
+	
 	var firstDayOfWeek: Date {
 		var beginningOfWeek = Date()
 		var interval = TimeInterval()

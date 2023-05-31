@@ -11,7 +11,7 @@ extension CGRect {
 	}
 	
 	/** the coordinates of this rectangles center */
-	var center: CGPoint
+	public var center: CGPoint
 	{
 		get { return CGPoint(x: centerX, y: centerY) }
 		set { centerX = newValue.x; centerY = newValue.y }
@@ -21,7 +21,7 @@ extension CGRect {
 	 - note: Acts as a settable midX
 	 - returns: The x-coordinate of the center
 	 */
-	var centerX: CGFloat
+	public var centerX: CGFloat
 	{
 		get { return midX }
 		set { origin.x = newValue - width * 0.5 }
@@ -31,7 +31,7 @@ extension CGRect {
 	 - note: Acts as a settable midY
 	 - returns: The y-coordinate of the center
 	 */
-	var centerY: CGFloat
+	public var centerY: CGFloat
 	{
 		get { return midY }
 		set { origin.y = newValue - height * 0.5 }
@@ -43,7 +43,7 @@ extension CGRect {
 	 - parameter center: The new center, ignored if nil
 	 - returns: A new rectangle with the same size and a new center
 	 */
-	func with(center: CGPoint?) -> CGRect
+	public func with(center: CGPoint?) -> CGRect
 	{
 		return CGRect(center: center ?? self.center, size: size)
 	}
@@ -52,7 +52,7 @@ extension CGRect {
 	 - parameter centerX: The new center-x, ignored if nil
 	 - returns: A new rectangle with the same size and a new center
 	 */
-	func with(centerX: CGFloat?) -> CGRect
+	public func with(centerX: CGFloat?) -> CGRect
 	{
 		return CGRect(center: CGPoint(x: centerX ?? self.centerX, y: centerY), size: size)
 	}
@@ -61,7 +61,7 @@ extension CGRect {
 	 - parameter centerY: The new center-y, ignored if nil
 	 - returns: A new rectangle with the same size and a new center
 	 */
-	func with(centerY: CGFloat?) -> CGRect
+	public func with(centerY: CGFloat?) -> CGRect
 	{
 		return CGRect(center: CGPoint(x: centerX, y: centerY ?? self.centerY), size: size)
 	}
@@ -71,8 +71,28 @@ extension CGRect {
 	 - parameter centerY: The new center-y, ignored if nil
 	 - returns: A new rectangle with the same size and a new center
 	 */
-	func with(centerX: CGFloat?, centerY: CGFloat?) -> CGRect
+	public func with(centerX: CGFloat?, centerY: CGFloat?) -> CGRect
 	{
 		return CGRect(center: CGPoint(x: centerX ?? self.centerX, y: centerY ?? self.centerY), size: size)
+	}
+	
+	public func distance(to rect: CGRect) -> CGSize {
+		if intersects(rect) {
+			return CGSize(width: 0, height: 0)
+		}
+		
+		let mostLeft = origin.x < rect.origin.x ? self : rect
+		let mostRight = rect.origin.x < self.origin.x ? self : rect
+		
+		var xDifference = mostLeft.origin.x == mostRight.origin.x ? 0 : mostRight.origin.x - (mostLeft.origin.x + mostLeft.size.width)
+		xDifference = CGFloat(max(0, xDifference))
+		
+		let upper = self.origin.y < rect.origin.y ? self : rect
+		let lower = rect.origin.y < self.origin.y ? self : rect
+		
+		var yDifference = upper.origin.y == lower.origin.y ? 0 : lower.origin.y - (upper.origin.y + upper.size.height)
+		yDifference = CGFloat(max(0, yDifference))
+		
+		return CGSize(width: xDifference, height: yDifference)
 	}
 }
