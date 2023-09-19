@@ -353,4 +353,16 @@ extension Sequence {
 		
 		return values
 	}
+	
+	@available(iOS 13.0, *)
+	@available(macOS 10.15.0, *)
+	public func asyncAllSatisfy(where predicate: (Element) async throws -> Bool) async throws -> Bool {
+		for element in self {
+			try Task.checkCancellation()
+			if try await !predicate(element) {
+				return false
+			}
+		}
+		return true
+	}
 }
