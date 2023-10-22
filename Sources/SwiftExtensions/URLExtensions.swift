@@ -1,4 +1,5 @@
 import Foundation
+import AppKit.NSWorkspace
 
 extension URL {
 	public var ipAddress: String? {
@@ -16,5 +17,9 @@ extension URL {
 		}
 		
 		return self
+	}
+	
+	public func open() {
+		NSWorkspace.shared.open(self)
 	}
 }

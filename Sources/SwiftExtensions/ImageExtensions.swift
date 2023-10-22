@@ -120,21 +120,21 @@ extension PlatformImage {
 		self.unlockFocus()
 	}
 	
-	public func resize(width: CGFloat, height: CGFloat) -> NSImage {
-		let img = NSImage(size: CGSize(width:width, height:height))
-		
-		img.lockFocus()
-		let ctx = NSGraphicsContext.current
-		ctx?.imageInterpolation = .high
-		self.draw(in: NSMakeRect(0, 0, width, height), from: NSMakeRect(0, 0, size.width, size.height), operation: .copy, fraction: 1)
-		img.unlockFocus()
-		
-		img.isTemplate = self.isTemplate
-		
-		return img
-	}
+//	public func resized(width: CGFloat, height: CGFloat) -> NSImage {
+//		let img = NSImage(size: CGSize(width:width, height:height))
+//		
+//		img.lockFocus()
+//		let ctx = NSGraphicsContext.current
+//		ctx?.imageInterpolation = .high
+//		self.draw(in: NSMakeRect(0, 0, width, height), from: NSMakeRect(0, 0, size.width, size.height), operation: .copy, fraction: 1)
+//		img.unlockFocus()
+//		
+//		img.isTemplate = self.isTemplate
+//		
+//		return img
+//	}
 	
-	public func resized(to newSize: NSSize, keepAspectRatio: Bool = true) -> NSImage? {
+	public func resized(to newSize: CGSize, keepAspectRatio: Bool = true) -> NSImage {
 		let currentSize = self.size
 		
 		var newSize = newSize
@@ -146,23 +146,17 @@ extension PlatformImage {
 			newSize.height = currentSize.height * ratio
 		}
 		
-		if let bitmapRep = NSBitmapImageRep(
-			bitmapDataPlanes: nil, pixelsWide: Int(newSize.width), pixelsHigh: Int(newSize.height),
-			bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
-			colorSpaceName: .calibratedRGB, bytesPerRow: 0, bitsPerPixel: 0
-		) {
-			bitmapRep.size = newSize
-			NSGraphicsContext.saveGraphicsState()
-			NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: bitmapRep)
-			draw(in: NSRect(x: 0, y: 0, width: newSize.width, height: newSize.height), from: .zero, operation: .copy, fraction: 1.0)
-			NSGraphicsContext.restoreGraphicsState()
-			
-			let resizedImage = NSImage(size: newSize)
-			resizedImage.addRepresentation(bitmapRep)
-			return resizedImage
-		}
+		let img = NSImage(size: newSize)
 		
-		return nil
+		img.lockFocus()
+		let ctx = NSGraphicsContext.current
+		ctx?.imageInterpolation = .high
+		self.draw(in: NSMakeRect(0, 0, newSize.width, newSize.height), from: NSMakeRect(0, 0, size.width, size.height), operation: .copy, fraction: 1)
+		img.unlockFocus()
+		
+		img.isTemplate = self.isTemplate
+		
+		return img
 	}
 	
 	public func tint(color: NSColor) -> NSImage {

@@ -191,13 +191,20 @@ extension InsettableShape {
 extension Color {
 	/// This color is either black or white, whichever is more accessible when viewed against the scrum color.
 	public var accessibleFontColor: Color {
+		self.accessibleFontColor()
+	}
+	
+	/// This color is either black or white, whichever is more accessible when viewed against the scrum color.
+	public func accessibleFontColor(in colorSpace: NSColorSpace = .deviceRGB) -> Color {
 		var red: CGFloat = 0
 		var green: CGFloat = 0
 		var blue: CGFloat = 0
 #if os(iOS)
-		UIColor(self).getRed(&red, green: &green, blue: &blue, alpha: nil)
+		guard let rgbColor = UIColor(self).usingColorSpace(colorSpace) else { return Color.primary }
+		rgbColor.getRed(&red, green: &green, blue: &blue, alpha: nil)
 #elseif os(macOS)
-		NSColor(self).getRed(&red, green: &green, blue: &blue, alpha: nil)
+		guard let rgbColor = NSColor(self).usingColorSpace(colorSpace) else { return Color.primary }
+		rgbColor.getRed(&red, green: &green, blue: &blue, alpha: nil)
 #endif
 		return isLightColor(red: red, green: green, blue: blue) ? .black : .white
 	}
@@ -216,4 +223,37 @@ extension Font {
 	static public func roundedFont(_ style: Font.TextStyle) -> Font {
 		Font.system(style, design: .rounded)
 	}
+}
+
+
+// MARK: Binding extension
+
+//extension Binding where Value: ExpressibleByNilLiteral {
+//	public var isSet: Binding<Bool> {
+//		Binding<Bool>(
+//			get: {
+//				let mirror = Mirror(reflecting: self.wrappedValue)
+//				return mirror.displayStyle == .optional && mirror.children.isEmpty == false
+//			},
+//			set: { isSet in
+//				if !isSet {
+//					self.wrappedValue = nil
+//				}
+//				// Do nothing if setting to true; we can't infer what the non-nil value should be.
+//			}
+//		)
+//	}
+//}
+
+extension Binding {
+	public func toPresented<T>() -> Binding<Bool> where Value == Optional<T> {
+		Binding<Bool> {
+			wrappedValue != nil
+		} set: {
+			if !$0 {
+				self.wrappedValue = nil
+			}
+		}
+	}
+	
 }
