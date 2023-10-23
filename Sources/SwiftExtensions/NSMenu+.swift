@@ -8,12 +8,18 @@
 import AppKit
 
 extension NSMenuItem {
-	public convenience init(title string: String) {
+	public convenience init(title string: String, image: NSImage? = nil) {
 		self.init(title: string, action: nil, keyEquivalent: "")
+		if let image {
+			self.image = image
+		}
 	}
 	
-	public convenience init(title string: String, action selector: Selector?) {
+	public convenience init(title string: String, image: NSImage? = nil, action selector: Selector?) {
 		self.init(title: string, action: selector, keyEquivalent: "")
+		if let image {
+			self.image = image
+		}
 	}
 }
 
@@ -27,8 +33,12 @@ extension NSMenu {
 		self.items.last?.target = target
 	}
 	
-	public func addItem(withTitle string: String, closure: ((NSMenuItem) -> Void)?, keyEquivalent: String = "") {
-		self.addItem(ActionMenuItem(title: string, closure: closure, keyEquivalent: keyEquivalent))
+	public func addItem(withTitle string: String, image: NSImage? = nil, state: Bool? = nil, keyEquivalent: String = "", closure action: @escaping (NSMenuItem) -> Void) {
+		self.addItem(ActionMenuItem(title: string, image: image, state: state, closure: action))
+	}
+	
+	public func addItem(withTitle string: String, image: NSImage? = nil, state: Bool? = nil, keyEquivalent: String = "", closure action: @escaping () -> Void) {
+		self.addItem(ActionMenuItem(title: string, image: image, state: state, closure: { _ in action() }))
 	}
 	
 	public func addSeparator() {
@@ -43,8 +53,8 @@ public class ActionMenuItem: NSMenuItem {
 	
 	public init(
 		title: String,
-		closure: ((NSMenuItem) -> Void)?,
-		keyEquivalent: String = ""
+		keyEquivalent: String = "",
+		closure: ((NSMenuItem) -> Void)?
 	) {
 		super.init(title: title, action: #selector(onClick), keyEquivalent: keyEquivalent)
 		self.closure = closure
@@ -53,12 +63,18 @@ public class ActionMenuItem: NSMenuItem {
 	
 	public convenience init(
 		title: String,
-		closure: ((NSMenuItem) -> Void)?,
+		image: NSImage? = nil,
+		state: Bool? = nil,
 		keyEquivalent: String = "",
-		image: NSImage? 
+		closure: ((NSMenuItem) -> Void)?
 	) {
-		self.init(title: title, closure: closure, keyEquivalent: keyEquivalent)
-		self.image = image
+		self.init(title: title, keyEquivalent: keyEquivalent, closure: closure)
+		if let image {
+			self.image = image
+		}
+		if let state {
+			self.state = state ? .on : .off
+		}
 	}
 	
 	required init(
