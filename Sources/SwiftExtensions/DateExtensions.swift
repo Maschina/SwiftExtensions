@@ -1,7 +1,7 @@
 import Foundation
 
-public extension Date {
-	init(month: Int, day: Int, year: Int, hour: Int = 0, minute: Int = 0, second: Int = 0) {
+extension Date {
+	public init(month: Int, day: Int, year: Int, hour: Int = 0, minute: Int = 0, second: Int = 0) {
 		var dateComponents = DateComponents()
 		dateComponents.month = month
 		dateComponents.day = day
@@ -14,7 +14,13 @@ public extension Date {
 		self = Calendar.current.date(from: dateComponents) ?? Date()
 	}
 	
-	func localDate() -> Date {
+	public init(hour: Int, minute: Int, second: Int) {
+		let currentDate = Date()
+		let components = Calendar.current.dateComponents([.day, .month, .year], from: currentDate)
+		self.init(month: components.month ?? 0, day: components.day ?? 0, year: components.year ?? 0, hour: hour, minute: minute, second: second)
+	}
+	
+	public func localDate() -> Date {
 		let timeZoneOffset = Double(TimeZone.current.secondsFromGMT(for: self))
 		guard let localDate = Calendar.current.date(byAdding: .second, value: Int(timeZoneOffset), to: self) else {
 			return self
@@ -22,7 +28,7 @@ public extension Date {
 		return localDate
 	}
 	
-	var firstDayOfWeek: Date {
+	public var firstDayOfWeek: Date {
 		var beginningOfWeek = Date()
 		var interval = TimeInterval()
 		
@@ -30,85 +36,90 @@ public extension Date {
 		return beginningOfWeek
 	}
 	
-	func addWeeks(_ numWeeks: Int) -> Date {
+	public func addWeeks(_ numWeeks: Int) -> Date {
 		var components = DateComponents()
 		components.weekOfYear = numWeeks
 		
 		return Calendar.current.date(byAdding: components, to: self)!
 	}
 	
-	func weeksAgo(_ numWeeks: Int) -> Date {
+	public func weeksAgo(_ numWeeks: Int) -> Date {
 		return addWeeks(-numWeeks)
 	}
 	
-	func addDays(_ numDays: Int) -> Date {
+	public func addDays(_ numDays: Int) -> Date {
 		var components = DateComponents()
 		components.day = numDays
 		
 		return Calendar.current.date(byAdding: components, to: self)!
 	}
 	
-	func daysAgo(_ numDays: Int) -> Date {
+	public func daysAgo(_ numDays: Int) -> Date {
 		return addDays(-numDays)
 	}
 	
-	func addHours(_ numHours: Int) -> Date {
+	public func addHours(_ numHours: Int) -> Date {
 		var components = DateComponents()
 		components.hour = numHours
 		
 		return Calendar.current.date(byAdding: components, to: self)!
 	}
 	
-	func hoursAgo(_ numHours: Int) -> Date {
+	public func hoursAgo(_ numHours: Int) -> Date {
 		return addHours(-numHours)
 	}
 	
-	func addMinutes(_ numMinutes: Double) -> Date {
+	public func addMinutes(_ numMinutes: Double) -> Date {
 		return self.addingTimeInterval(60 * numMinutes)
 	}
 	
-	func minutesAgo(_ numMinutes: Double) -> Date {
+	public func minutesAgo(_ numMinutes: Double) -> Date {
 		return addMinutes(-numMinutes)
 	}
 	
-	var startOfDay: Date {
+	public var startOfDay: Date {
 		return Calendar.current.startOfDay(for: self)
 	}
 	
-	var endOfDay: Date {
+	public var endOfDay: Date {
 		let cal = Calendar.current
 		var components = DateComponents()
 		components.day = 1
 		return cal.date(byAdding: components, to: self.startOfDay)!.addingTimeInterval(-1)
 	}
 	
-	var zeroBasedDayOfWeek: Int? {
+	public var zeroBasedDayOfWeek: Int? {
 		let comp = Calendar.current.component(.weekday, from: self)
 		return comp - 1
 	}
 	
-	func hoursFrom(_ date: Date) -> Double {
+	public func hoursFrom(_ date: Date) -> Double {
 		return Double(Calendar.current.dateComponents([.hour], from: date, to: self).hour!)
 	}
 	
-	func daysBetween(_ date: Date) -> Int {
+	public func daysBetween(_ date: Date) -> Int {
 		let calendar = Calendar.current
 		let components = calendar.dateComponents([.day], from: self.startOfDay, to: date.startOfDay)
 		
 		return components.day!
 	}
 	
-	var percentageOfDay: Double {
+	public var percentageOfDay: Double {
 		let totalSeconds = self.endOfDay.timeIntervalSince(self.startOfDay) + 1
 		let seconds = self.timeIntervalSince(self.startOfDay)
 		let percentage = seconds / totalSeconds
 		return max(min(percentage, 1.0), 0.0)
 	}
 	
-	var numberOfWeeksInMonth: Int {
+	public var numberOfWeeksInMonth: Int {
 		let calendar = Calendar.current
 		let weekRange = (calendar as NSCalendar).range(of: NSCalendar.Unit.weekOfYear, in: NSCalendar.Unit.month, for: self)
 		
 		return weekRange.length
+	}
+	
+	public var timeComponents: (hour: Int, minute: Int, second: Int) {
+		var components = Calendar.current.dateComponents([.hour, .minute, .second], from: self)
+		return (hour: components.hour ?? 0, minute: components.minute ?? 0, second: components.second ?? 0)
 	}
 }

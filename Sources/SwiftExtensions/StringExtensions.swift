@@ -74,6 +74,10 @@ extension String.StringInterpolation {
 			appendLiteral(result)
 		}
 	}
+	
+	public mutating func appendInterpolation(_ date: Date, format: DateFormatter) {
+		appendLiteral(format.string(from: date))
+	}
 }
 
 //extension Optional where Wrapped == String {
