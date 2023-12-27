@@ -228,23 +228,6 @@ extension Font {
 
 // MARK: Binding extension
 
-//extension Binding where Value: ExpressibleByNilLiteral {
-//	public var isSet: Binding<Bool> {
-//		Binding<Bool>(
-//			get: {
-//				let mirror = Mirror(reflecting: self.wrappedValue)
-//				return mirror.displayStyle == .optional && mirror.children.isEmpty == false
-//			},
-//			set: { isSet in
-//				if !isSet {
-//					self.wrappedValue = nil
-//				}
-//				// Do nothing if setting to true; we can't infer what the non-nil value should be.
-//			}
-//		)
-//	}
-//}
-
 extension Binding {
 	public func toPresented<T>() -> Binding<Bool> where Value == Optional<T> {
 		Binding<Bool> {
@@ -256,4 +239,33 @@ extension Binding {
 		}
 	}
 	
+}
+
+extension Binding {
+	/// Wrapper to listen to didSet of Binding
+	func didSet(_ didSet: @escaping ((newValue: Value, oldValue: Value)) -> Void) -> Binding<Value> {
+		return .init(get: { self.wrappedValue }, set: { newValue in
+			let oldValue = self.wrappedValue
+			self.wrappedValue = newValue
+			didSet((newValue, oldValue))
+		})
+	}
+	
+	/// Wrapper to listen to willSet of Binding
+	func willSet(_ willSet: @escaping ((newValue: Value, oldValue: Value)) -> Bool) -> Binding<Value> {
+		return .init(get: { self.wrappedValue }, set: { newValue in
+			if willSet((newValue, self.wrappedValue)) {
+				self.wrappedValue = newValue
+			}
+		})
+	}
+}
+
+
+// MARK: Menu
+
+extension Menu {
+	public init(@ViewBuilder content: () -> Content) where Label == Text {
+		self.init("", content: content)
+	}
 }

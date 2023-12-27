@@ -1,5 +1,25 @@
 import Foundation
 
+// MARK: =*
+
+// apply only if new
+infix operator =* : AssignmentPrecedence
+
+// apply only if new
+public func =*<T: Equatable>(target: inout T, value: T) {
+	guard target == value else { return }
+	target = value
+}
+
+extension Equatable {
+	public mutating func set(ifNew value: any Equatable) {
+		guard let value = value as? Self else { return }
+		guard value != self else { return }
+		self = value
+	}
+}
+
+
 // MARK: <-??
 
 infix operator <-?? : AssignmentPrecedence
@@ -17,6 +37,7 @@ public func <-??<T>(target: inout T, value: T?) {
         target = value
     }
 }
+
 
 // MARK: ^^
 

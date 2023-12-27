@@ -75,6 +75,12 @@ extension String.StringInterpolation {
 		}
 	}
 	
+	public mutating func appendInterpolation(_ number: Double, format: NumberFormatter) {
+		if let result = format.string(from: number as NSNumber) {
+			appendLiteral(result)
+		}
+	}
+	
 	public mutating func appendInterpolation(_ date: Date, format: DateFormatter) {
 		appendLiteral(format.string(from: date))
 	}

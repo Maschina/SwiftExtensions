@@ -73,11 +73,11 @@ public extension Publisher {
 	/// - parameter receiveComplete: The closure to execute on completion.
 	/// - parameter receiveValue: The closure to be awaited to execute within a concurrent Task on receipt of a value.
 	/// - Returns: A cancellable instance, which you use when you end assignment of the received value. Deallocation of the result will tear down the subscription stream.
-	func sink<T>(receiveCompletion: @escaping ((Subscribers.Completion<Self.Failure>) -> Void), receiveValue: @escaping ((Self.Output) async -> T)) -> AnyCancellable {
+	func sink<T>(taskPriority: TaskPriority? = nil, receiveCompletion: @escaping ((Subscribers.Completion<Self.Failure>) -> Void), receiveValue: @escaping ((Self.Output) async -> T)) -> AnyCancellable {
 		sink { completion in
 			receiveCompletion(completion)
 		} receiveValue: { value in
-			Task {
+			Task(priority: taskPriority) {
 				await receiveValue(value)
 			}
 		}
