@@ -1,11 +1,11 @@
-// swift-tools-version:5.3
+// swift-tools-version: 5.7
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
     name: "SwiftExtensions",
-	platforms: [.iOS(.v14), .macOS(.v11)],
+	platforms: [.iOS(.v15), .macOS(.v12)],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
@@ -27,3 +27,12 @@ let package = Package(
             dependencies: ["SwiftExtensions"]),
     ]
 )
+
+for target in package.targets {
+	target.swiftSettings = target.swiftSettings ?? []
+	target.swiftSettings?.append(
+		.unsafeFlags([
+			"-enable-bare-slash-regex",
+		])
+	)
+}

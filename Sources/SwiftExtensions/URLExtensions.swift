@@ -2,21 +2,23 @@ import Foundation
 import AppKit.NSWorkspace
 
 extension URL {
+	@available(macOS 13.0, *)
 	public var ipAddress: String? {
-		let regex = NSRegularExpression("([0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3})")
-		return regex.match(self.absoluteString, groupIndex: 1)
+		let regex = /([0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3})/
+		do {
+			guard let host = self.host() else { return nil }
+			guard let matchingIPaddress = try regex.firstMatch(in: host) else { return nil }
+			return String(matchingIPaddress.1)
+		} catch {
+			return nil
+		}
 	}
 	
-	public var sanitise: URL {
-		if var components = URLComponents(url: self, resolvingAgainstBaseURL: false) {
-			if components.scheme == nil {
-				components.scheme = "http"
-			}
-			
-			return components.url ?? self
-		}
-		
-		return self
+	@available(macOS 13.0, *)
+	public var hasIpAddress: Bool {
+		let regex = /[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}/
+		guard let host = self.host() else { return false }
+		return host.firstMatch(of: regex) != nil
 	}
 	
 	public func open() {
