@@ -8,6 +8,11 @@ extension Task where Success == Never, Failure == Never {
 		try await sleep(nanoseconds: duration)
 	}
 	
+	public static func sleep(timeInterval: TimeInterval) async throws {
+		let duration = UInt64(timeInterval * TimeInterval(NSEC_PER_SEC))
+		try await sleep(nanoseconds: duration)
+	}
+	
 	public static func sleep(milliseconds: Int) async throws {
 		let duration = UInt64(milliseconds) * NSEC_PER_MSEC
 		try await sleep(nanoseconds: duration)

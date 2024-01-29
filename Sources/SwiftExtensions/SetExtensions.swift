@@ -26,4 +26,17 @@ extension Set {
 			self.insert(element)
 		}
 	}
+	
+	public func asyncFilter(_ validate: (Element) async throws -> Bool) async throws -> Set<Element> {
+		var values = Set<Element>()
+		
+		for element in self {
+			try Task.checkCancellation()
+			if try await validate(element) {
+				values.insert(element)
+			}
+		}
+		
+		return values
+	}
 }
