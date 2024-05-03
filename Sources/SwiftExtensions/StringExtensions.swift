@@ -34,13 +34,6 @@ extension String {
 		return self.components(separatedBy: .newlines).joined()
 	}
 	
-	@available(macOS 10.12, *)
-	public func dateFormatterISO8601() -> Date? {
-		guard self != "none" else { return nil }
-		let formatter = ISO8601DateFormatter()
-		return formatter.date(from: (self) + "Z") ?? Date()
-	}
-	
 	static func localizedString(for key: String,
 								locale: Locale = .current) -> String {
 		

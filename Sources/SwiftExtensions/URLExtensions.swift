@@ -1,5 +1,6 @@
 import Foundation
 import AppKit.NSWorkspace
+import UniformTypeIdentifiers
 
 extension URL {
 	@available(macOS 13.0, *)
@@ -23,5 +24,14 @@ extension URL {
 	
 	public func open() {
 		NSWorkspace.shared.open(self)
+	}
+	
+	public var mimeType: String {
+		if let mimeType = UTType(filenameExtension: self.pathExtension)?.preferredMIMEType {
+			return mimeType
+		}
+		else {
+			return "application/octet-stream"
+		}
 	}
 }
