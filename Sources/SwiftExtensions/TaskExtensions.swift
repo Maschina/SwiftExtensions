@@ -57,7 +57,8 @@ extension Task where Failure == Error {
 	public init(
 		priority: TaskPriority? = nil,
 		timeout: Duration,
-		operation: @escaping @Sendable () async throws -> Success
+		operation: @escaping @Sendable () async throws -> Success,
+		timeoutHandler:  @escaping @Sendable () async -> () = { }
 	) {
 		self = Task(priority: priority) {
 			try await withThrowingTaskGroup(of: Success.self) { group -> Success in
@@ -69,6 +70,7 @@ extension Task where Failure == Error {
 					throw TimeoutError()
 				}
 				guard let success = try await group.next() else {
+					await timeoutHandler()
 					throw _Concurrency.CancellationError()
 				}
 				group.cancelAll()
