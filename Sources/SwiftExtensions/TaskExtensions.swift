@@ -18,3 +18,11 @@ extension Task where Success == Never, Failure == Never {
 		try await sleep(nanoseconds: duration)
 	}
 }
+
+extension Task {
+	/// Awaits the completion of the task with the option to discard the result
+	@discardableResult
+	public func finish() async -> Result<Success, Failure> {
+		await self.result
+	}
+}
