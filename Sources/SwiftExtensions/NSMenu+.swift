@@ -25,12 +25,15 @@ extension NSMenuItem {
 
 extension NSMenu {
 	public func addItem(withTitle string: String) {
-		self.addItem(withTitle: string, action: nil as Selector?, keyEquivalent: "")
+		let item = NSMenuItem(title: string, action: nil, keyEquivalent: "")
+		item.isEnabled = false
+		self.addItem(item)
 	}
 	
 	public func addItem(withTitle string: String, action selector: Selector?, target: AnyObject? = nil) {
-		self.addItem(withTitle: string, action: selector, keyEquivalent: "")
-		self.items.last?.target = target
+		let item = NSMenuItem(title: string, action: selector, keyEquivalent: "")
+		item.target = target
+		self.addItem(item)
 	}
 	
 	public func addItem(withTitle string: String, image: NSImage? = nil, state: Bool? = nil, keyEquivalent: String = "", closure action: @escaping (NSMenuItem) -> Void) {
