@@ -119,7 +119,7 @@ extension Date {
 	}
 	
 	public var timeComponents: (hour: Int, minute: Int, second: Int) {
-		var components = Calendar.current.dateComponents([.hour, .minute, .second], from: self)
+		let components = Calendar.current.dateComponents([.hour, .minute, .second], from: self)
 		return (hour: components.hour ?? 0, minute: components.minute ?? 0, second: components.second ?? 0)
 	}
 }
