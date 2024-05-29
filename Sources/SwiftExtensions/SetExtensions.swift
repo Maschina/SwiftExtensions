@@ -40,3 +40,10 @@ extension Set {
 		return values
 	}
 }
+
+extension Set where Element: Equatable {
+	/// Similar as the contains(:) function but uses Equatable instead of Hashable protocol
+	@inlinable public func equallyContains(_ member: Element) -> Bool {
+		self.first(where: { $0 == member }) != nil
+	}
+}
