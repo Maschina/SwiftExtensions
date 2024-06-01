@@ -14,6 +14,21 @@ extension Set {
 		self.update(with: element)
 	}
 	
+	/// Update element based on update handler that matches to a given predicate.
+	///
+	/// The regular update function relies on the Hash of the Set elements. This function provides the capabilty to assert different conditions. Update is being handled through the update handler. If predicate fails, there will be no update being applied.
+	/// - Parameters:
+	///   - updateHandler: Element to be inserted or updated
+	///   - predicate: Conditions of the element to be replaced. If conditions cannot be met, new element will be inserted only.
+	public mutating func update(
+		with updateHandler: (Element) -> Void,
+		matching predicate: (Element) throws -> Bool
+	) rethrows {
+		if let existingElement = try self.first(where: predicate) {
+			updateHandler(existingElement)
+		}
+	}
+	
 	/// Replace element based on conditions.
 	///
 	/// The regular update functions add the given element, if not yet present. This function only replaces (remove and insert), if the predicate is met.
@@ -38,12 +53,5 @@ extension Set {
 		}
 		
 		return values
-	}
-}
-
-extension Set where Element: Equatable {
-	/// Similar as the contains(:) function but uses Equatable instead of Hashable protocol
-	@inlinable public func equallyContains(_ member: Element) -> Bool {
-		self.first(where: { $0 == member }) != nil
 	}
 }
