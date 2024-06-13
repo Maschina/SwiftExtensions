@@ -21,13 +21,14 @@ final class SetExtensionTests: XCTestCase {
 		let oldSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b")]
 		let newSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "c")]
 		
-		let changes = newSet.changes(to: oldSet, elementsEquatable: { (oldElement, newElement) -> Bool in
+		let delta = newSet.diff(to: oldSet)
+		let changes = newSet.compare(with: oldSet, elementsEquatable: { (oldElement, newElement) -> Bool in
 			oldElement.value == newElement.value
 		})
 		
-		XCTAssert(changes.removed.isEmpty, "Result: \(changes.removed)")
-		XCTAssert(changes.changed.isEmpty, "Result: \(changes.changed)")
-		XCTAssert(changes.added.contains(TestType(id: 3, value: "c")), "Result: \(changes.added)")
+		XCTAssert(delta.removed.isEmpty, "Result: \(delta.removed)")
+		XCTAssert(changes.isEmpty, "Result: \(changes)")
+		XCTAssert(delta.added.contains(TestType(id: 3, value: "c")), "Result: \(delta.added)")
     }
 	
 	/// Removed element
@@ -35,13 +36,14 @@ final class SetExtensionTests: XCTestCase {
 		let oldSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "c")]
 		let newSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b")]
 		
-		let changes = newSet.changes(to: oldSet, elementsEquatable: { (oldElement, newElement) -> Bool in
+		let delta = newSet.diff(to: oldSet)
+		let changes = newSet.compare(with: oldSet, elementsEquatable: { (oldElement, newElement) -> Bool in
 			oldElement.value == newElement.value
 		})
 		
-		XCTAssert(changes.changed.isEmpty, "Result: \(changes.changed)")
-		XCTAssert(changes.added.isEmpty, "Result: \(changes.added)")
-		XCTAssert(changes.removed.contains(TestType(id: 3, value: "c")), "Result: \(changes.removed)")
+		XCTAssert(changes.isEmpty, "Result: \(changes)")
+		XCTAssert(delta.added.isEmpty, "Result: \(delta.added)")
+		XCTAssert(delta.removed.contains(TestType(id: 3, value: "c")), "Result: \(delta.removed)")
 	}
 	
 	/// Changed value of one element
@@ -49,13 +51,14 @@ final class SetExtensionTests: XCTestCase {
 		let oldSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "c")]
 		let newSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "d")]
 		
-		let changes = newSet.changes(to: oldSet, elementsEquatable: { (oldElement, newElement) -> Bool in
+		let delta = newSet.diff(to: oldSet)
+		let changes = newSet.compare(with: oldSet, elementsEquatable: { (oldElement, newElement) -> Bool in
 			oldElement.value == newElement.value
 		})
 		
-		XCTAssert(changes.removed.isEmpty, "Result: \(changes.removed)")
-		XCTAssert(changes.added.isEmpty, "Result: \(changes.added)")
-		XCTAssert(changes.changed.contains(TestType(id: 3, value: "d")), "Result: \(changes.changed)")
+		XCTAssert(delta.removed.isEmpty, "Result: \(delta.removed)")
+		XCTAssert(delta.added.isEmpty, "Result: \(delta.added)")
+		XCTAssert(changes.contains(TestType(id: 3, value: "d")), "Result: \(changes)")
 	}
 	
 	/// Changed hash/equatable (identifier) of one element
@@ -63,13 +66,14 @@ final class SetExtensionTests: XCTestCase {
 		let oldSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "c")]
 		let newSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 4, value: "c")]
 		
-		let changes = newSet.changes(to: oldSet, elementsEquatable: { (oldElement, newElement) -> Bool in
+		let delta = newSet.diff(to: oldSet)
+		let changes = newSet.compare(with: oldSet, elementsEquatable: { (oldElement, newElement) -> Bool in
 			oldElement.value == newElement.value
 		})
 		
-		XCTAssert(changes.changed.isEmpty, "Result: \(changes.changed)")
-		XCTAssert(changes.added.contains(TestType(id: 4, value: "c")), "Result: \(changes.added)")
-		XCTAssert(changes.removed.contains(TestType(id: 3, value: "c")), "Result: \(changes.removed)")
+		XCTAssert(changes.isEmpty, "Result: \(changes)")
+		XCTAssert(delta.added.contains(TestType(id: 4, value: "c")), "Result: \(delta.added)")
+		XCTAssert(delta.removed.contains(TestType(id: 3, value: "c")), "Result: \(delta.removed)")
 	}
 	
 	/// Added element to an empty set
@@ -77,13 +81,14 @@ final class SetExtensionTests: XCTestCase {
 		let oldSet: Set<TestType> = []
 		let newSet: Set<TestType> = [TestType(id: 1, value: "a")]
 		
-		let changes = newSet.changes(to: oldSet, elementsEquatable: { (oldElement, newElement) -> Bool in
+		let delta = newSet.diff(to: oldSet)
+		let changes = newSet.compare(with: oldSet, elementsEquatable: { (oldElement, newElement) -> Bool in
 			oldElement.value == newElement.value
 		})
 		
-		XCTAssert(changes.removed.isEmpty, "Result: \(changes.removed)")
-		XCTAssert(changes.changed.isEmpty, "Result: \(changes.changed)")
-		XCTAssert(changes.added.contains(TestType(id: 1, value: "a")), "Result: \(changes.added)")
+		XCTAssert(delta.removed.isEmpty, "Result: \(delta.removed)")
+		XCTAssert(changes.isEmpty, "Result: \(changes)")
+		XCTAssert(delta.added.contains(TestType(id: 1, value: "a")), "Result: \(delta.added)")
 	}
 	
 	/// Nothing changed
@@ -91,13 +96,14 @@ final class SetExtensionTests: XCTestCase {
 		let oldSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "c")]
 		let newSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "c")]
 		
-		let changes = newSet.changes(to: oldSet, elementsEquatable: { (oldElement, newElement) -> Bool in
+		let delta = newSet.diff(to: oldSet)
+		let changes = newSet.compare(with: oldSet, elementsEquatable: { (oldElement, newElement) -> Bool in
 			oldElement.value == newElement.value
 		})
 		
-		XCTAssert(changes.removed.isEmpty, "Result: \(changes.removed)")
-		XCTAssert(changes.changed.isEmpty, "Result: \(changes.changed)")
-		XCTAssert(changes.added.isEmpty, "Result: \(changes.added)")
+		XCTAssert(delta.removed.isEmpty, "Result: \(delta.removed)")
+		XCTAssert(changes.isEmpty, "Result: \(changes)")
+		XCTAssert(delta.added.isEmpty, "Result: \(delta.added)")
 	}
 	
 	/// No elementsEquatable given but value changed
@@ -105,11 +111,12 @@ final class SetExtensionTests: XCTestCase {
 		let oldSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "c")]
 		let newSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "d")]
 		
-		let changes = newSet.changes(to: oldSet)
+		let delta = newSet.diff(to: oldSet)
+		let changes = newSet.compare(with: oldSet, elementsEquatable: { _,_ in return true })
 		
-		XCTAssert(changes.removed.isEmpty, "Result: \(changes.removed)")
-		XCTAssert(changes.changed.isEmpty, "Result: \(changes.changed)")
-		XCTAssert(changes.added.isEmpty, "Result: \(changes.added)")
+		XCTAssert(delta.removed.isEmpty, "Result: \(delta.removed)")
+		XCTAssert(changes.isEmpty, "Result: \(changes)")
+		XCTAssert(delta.added.isEmpty, "Result: \(delta.added)")
 	}
 	
 	/// No elementsEquatable given but id changed
@@ -117,10 +124,11 @@ final class SetExtensionTests: XCTestCase {
 		let oldSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "c")]
 		let newSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 4, value: "c")]
 		
-		let changes = newSet.changes(to: oldSet)
+		let delta = newSet.diff(to: oldSet)
+		let changes = newSet.compare(with: oldSet, elementsEquatable: { _,_ in return true })
 		
-		XCTAssert(changes.changed.isEmpty, "Result: \(changes.changed)")
-		XCTAssert(changes.added.contains(TestType(id: 4, value: "c")), "Result: \(changes.added)")
-		XCTAssert(changes.removed.contains(TestType(id: 3, value: "c")), "Result: \(changes.removed)")
+		XCTAssert(changes.isEmpty, "Result: \(changes)")
+		XCTAssert(delta.added.contains(TestType(id: 4, value: "c")), "Result: \(delta.added)")
+		XCTAssert(delta.removed.contains(TestType(id: 3, value: "c")), "Result: \(delta.removed)")
 	}
 }

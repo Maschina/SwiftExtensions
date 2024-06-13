@@ -27,17 +27,25 @@ extension Set {
 		}
 	}
 	
-	/// Calculate the changes from the given set to the current
+	/// Calculate the added and removed elements from the given set to the current
 	/// - Parameters:
 	///   - previous: The given set based on what you need to calculate the changes
-	///   - elementsEquatable: Optional: Handler to define what has to be evaluated as "not changed", whereas the first parameter depicts an element from the current set and the second parameter depicts an element from the given (previous) set. Whenever this handler returns false for any pair that are equal (defined through `Equatable`), it will return the element from the current set as `changed`.
-	/// - Returns: Tuple of calculated changes in the following order: `added`, `removed` and `changed`
-	public func changes(to previous: Set<Element>, elementsEquatable: (_ current: Element, _ previous: Element) -> Bool = { _, _ in true }) -> (added: Set<Element>, removed: Set<Element>, changed: Set<Element>) {
+	/// - Returns: Tuple of calculated changes in the following order: `added`, `removed`. Unequal elements will not be returned. Use the `compare(to:)` function if needed.
+	public func diff(to previous: Set<Element>) -> (added: Set<Element>, removed: Set<Element>) {
 		// Returns a new set containing the elements of this set that do not occur in the previous set.
 		let added = self.subtracting(previous)
 		// Returns a new set containing the elements of the previous set that do not occur in this set.
 		let removed = previous.subtracting(self)
-		
+
+		return (added, removed)
+	}
+	
+	/// Calculate the changed elements from the given set to the current
+	/// - Parameters:
+	///   - previous: The given set based on what you need to calculate the changes
+	///   - elementsEquatable: Optional: Handler to define what has to be evaluated as "not changed", whereas the first parameter depicts an element from the current set and the second parameter depicts an element from the given (previous) set. Whenever this handler returns false for any pair that are equal (defined through `Equatable`), it will return the element from the current set as `changed`.
+	/// - Returns: Calculated changes without added and removed elements. Use the `diff(to:)` function if needed.
+	public func compare(with previous: Set<Element>, elementsEquatable: (_ current: Element, _ previous: Element) -> Bool) -> Set<Element> {
 		var changed = Set<Element>()
 		// Check for changes in elements that are present in both sets
 		for oldElement in previous {
@@ -49,7 +57,7 @@ extension Set {
 			}
 		}
 		
-		return (added, removed, changed)
+		return changed
 	}
 	
 	public func asyncFilter(_ validate: (Element) async throws -> Bool) async throws -> Set<Element> {
