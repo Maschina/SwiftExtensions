@@ -190,12 +190,12 @@ extension InsettableShape {
 
 extension Color {
 	/// This color is either black or white, whichever is more accessible when viewed against the scrum color.
-	public var accessibleFontColor: Color {
-		self.accessibleFontColor()
+	public var bestContrastColor: Color {
+		self.bestContrastColor()
 	}
 	
 	/// This color is either black or white, whichever is more accessible when viewed against the scrum color.
-	public func accessibleFontColor(in colorSpace: NSColorSpace = .deviceRGB) -> Color {
+	public func bestContrastColor(in colorSpace: NSColorSpace = .deviceRGB) -> Color {
 		var red: CGFloat = 0
 		var green: CGFloat = 0
 		var blue: CGFloat = 0
@@ -207,6 +207,18 @@ extension Color {
 		rgbColor.getRed(&red, green: &green, blue: &blue, alpha: nil)
 #endif
 		return isLightColor(red: red, green: green, blue: blue) ? .black : .white
+	}
+	
+	/// This color is either black or white, whichever is more accessible when viewed against the scrum color.
+	@available(*, deprecated, renamed: "bestContrastColor")
+	public var accessibleFontColor: Color {
+		self.bestContrastColor()
+	}
+	
+	/// This color is either black or white, whichever is more accessible when viewed against the scrum color.
+	@available(*, deprecated, renamed: "bestContrastColor(in:)")
+	public func accessibleFontColor(in colorSpace: NSColorSpace = .deviceRGB) -> Color {
+		bestContrastColor(in: colorSpace)
 	}
 	
 	private func isLightColor(red: CGFloat, green: CGFloat, blue: CGFloat) -> Bool {
