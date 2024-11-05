@@ -1,6 +1,13 @@
 import SwiftUI
 
 extension View {
+	@ViewBuilder
+	public func modifiers<Content: View>(@ViewBuilder content: @escaping (Self) -> Content) -> some View {
+		content(self)
+	}
+}
+
+extension View {
 	/// Conditionally apply modifiers to views
 	/// - Parameters:
 	///   - condition: Condition when to apply
