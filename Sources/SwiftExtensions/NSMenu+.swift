@@ -76,6 +76,19 @@ extension NSMenu {
 	public func addSeparator() {
 		self.addItem(NSMenuItem.separator())
 	}
+	
+	@available(macOS 14.0, *)
+	public func addHeader(
+		withTitle string: String,
+		image: NSImage? = nil
+	) {
+		let item = NSMenuItem.sectionHeader(title: string)
+		item.isEnabled = false
+		if let image {
+			item.image = image
+		}
+		self.addItem(item)
+	}
 }
 
 // MARK: ActionMenuItem
