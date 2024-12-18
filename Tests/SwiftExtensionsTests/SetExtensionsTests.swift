@@ -1,7 +1,8 @@
 import XCTest
 @testable import SwiftExtensions
+import Testing
 
-final class SetExtensionTests: XCTestCase {
+struct SetExtensionTests {
 	struct TestType: Hashable, Equatable {
 		let id: Int
 		let value: String
@@ -11,87 +12,86 @@ final class SetExtensionTests: XCTestCase {
 		}
 		
 		static func == (lhs: TestType, rhs: TestType) -> Bool {
-			guard lhs.id == rhs.id else { return false }
-			return true
+			lhs.id == rhs.id
 		}
 	}
-
-	/// Added element
-    func testChanges1() throws {
+	
+	@Test("Added element")
+	func testChanges1() async throws {
 		let oldSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b")]
 		let newSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "c")]
 		
 		let delta = newSet.diff(to: oldSet)
-		let changes = newSet.compare(with: oldSet, elementsEquatable: { (oldElement, newElement) -> Bool in
+		let changes = newSet.compare(with: oldSet) { oldElement, newElement in
 			oldElement.value == newElement.value
-		})
+		}
 		
-		XCTAssert(delta.removed.isEmpty, "Result: \(delta.removed)")
-		XCTAssert(changes.isEmpty, "Result: \(changes)")
-		XCTAssert(delta.added.contains(TestType(id: 3, value: "c")), "Result: \(delta.added)")
-    }
+		#expect(delta.removed.isEmpty, "Expected no elements to be removed, but found: \(delta.removed)")
+		#expect(changes.isEmpty, "Expected no changes, but found: \(changes)")
+		#expect(delta.added.contains(TestType(id: 3, value: "c")), "Expected added elements to contain TestType(id: 3, value: 'c'), but found: \(delta.added)")
+	}
 	
-	/// Removed element
-	func testChanges2() throws {
+	@Test("Removed element")
+	func testChanges2() async throws {
 		let oldSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "c")]
 		let newSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b")]
 		
 		let delta = newSet.diff(to: oldSet)
-		let changes = newSet.compare(with: oldSet, elementsEquatable: { (oldElement, newElement) -> Bool in
+		let changes = newSet.compare(with: oldSet) { oldElement, newElement in
 			oldElement.value == newElement.value
-		})
+		}
 		
-		XCTAssert(changes.isEmpty, "Result: \(changes)")
-		XCTAssert(delta.added.isEmpty, "Result: \(delta.added)")
-		XCTAssert(delta.removed.contains(TestType(id: 3, value: "c")), "Result: \(delta.removed)")
+		#expect(changes.isEmpty, "Expected no changes, but found: \(changes)")
+		#expect(delta.added.isEmpty, "Expected no elements to be added, but found: \(delta.added)")
+		#expect(delta.removed.contains(TestType(id: 3, value: "c")), "Expected removed elements to contain TestType(id: 3, value: 'c'), but found: \(delta.removed)")
 	}
 	
-	/// Changed value of one element
-	func testChanges3() throws {
+	@Test("Changed value of one element")
+	func testChanges3() async throws {
 		let oldSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "c")]
 		let newSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "d")]
 		
 		let delta = newSet.diff(to: oldSet)
-		let changes = newSet.compare(with: oldSet, elementsEquatable: { (oldElement, newElement) -> Bool in
+		let changes = newSet.compare(with: oldSet) { oldElement, newElement in
 			oldElement.value == newElement.value
-		})
+		}
 		
-		XCTAssert(delta.removed.isEmpty, "Result: \(delta.removed)")
-		XCTAssert(delta.added.isEmpty, "Result: \(delta.added)")
-		XCTAssert(changes.contains(TestType(id: 3, value: "d")), "Result: \(changes)")
+		#expect(delta.removed.isEmpty, "Expected no elements to be removed, but found: \(delta.removed)")
+		#expect(delta.added.isEmpty, "Expected no elements to be added, but found: \(delta.added)")
+		#expect(changes.contains(TestType(id: 3, value: "d")), "Expected changes to contain TestType(id: 3, value: 'd'), but found: \(changes)")
 	}
 	
-	/// Changed hash/equatable (identifier) of one element
-	func testChanges4() throws {
+	@Test("Changed hash/equatable (identifier) of one element")
+	func testChanges4() async throws {
 		let oldSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "c")]
 		let newSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 4, value: "c")]
 		
 		let delta = newSet.diff(to: oldSet)
-		let changes = newSet.compare(with: oldSet, elementsEquatable: { (oldElement, newElement) -> Bool in
+		let changes = newSet.compare(with: oldSet) { oldElement, newElement in
 			oldElement.value == newElement.value
-		})
+		}
 		
-		XCTAssert(changes.isEmpty, "Result: \(changes)")
-		XCTAssert(delta.added.contains(TestType(id: 4, value: "c")), "Result: \(delta.added)")
-		XCTAssert(delta.removed.contains(TestType(id: 3, value: "c")), "Result: \(delta.removed)")
+		#expect(changes.isEmpty, "Expected no changes, but found: \(changes)")
+		#expect(delta.added.contains(TestType(id: 4, value: "c")), "Expected added elements to contain TestType(id: 4, value: 'c'), but found: \(delta.added)")
+		#expect(delta.removed.contains(TestType(id: 3, value: "c")), "Expected removed elements to contain TestType(id: 3, value: 'c'), but found: \(delta.removed)")
 	}
 	
-	/// Added element to an empty set
-	func testChanges5() throws {
+	@Test("Added element to an empty set")
+	func testChanges5() async throws {
 		let oldSet: Set<TestType> = []
 		let newSet: Set<TestType> = [TestType(id: 1, value: "a")]
 		
 		let delta = newSet.diff(to: oldSet)
-		let changes = newSet.compare(with: oldSet, elementsEquatable: { (oldElement, newElement) -> Bool in
+		let changes = newSet.compare(with: oldSet) { oldElement, newElement in
 			oldElement.value == newElement.value
-		})
+		}
 		
-		XCTAssert(delta.removed.isEmpty, "Result: \(delta.removed)")
-		XCTAssert(changes.isEmpty, "Result: \(changes)")
-		XCTAssert(delta.added.contains(TestType(id: 1, value: "a")), "Result: \(delta.added)")
+		#expect(delta.removed.isEmpty, "Expected no elements to be removed, but found: \(delta.removed)")
+		#expect(changes.isEmpty, "Expected no changes, but found: \(changes)")
+		#expect(delta.added.contains(TestType(id: 1, value: "a")), "Expected added elements to contain TestType(id: 1, value: 'a'), but found: \(delta.added)")
 	}
 	
-	/// Nothing changed
+	@Test
 	func testChanges6() throws {
 		let oldSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "c")]
 		let newSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "c")]
@@ -101,12 +101,12 @@ final class SetExtensionTests: XCTestCase {
 			oldElement.value == newElement.value
 		})
 		
-		XCTAssert(delta.removed.isEmpty, "Result: \(delta.removed)")
-		XCTAssert(changes.isEmpty, "Result: \(changes)")
-		XCTAssert(delta.added.isEmpty, "Result: \(delta.added)")
+		#expect(delta.removed.isEmpty, "Result: \(delta.removed)")
+		#expect(changes.isEmpty, "Result: \(changes)")
+		#expect(delta.added.isEmpty, "Result: \(delta.added)")
 	}
 	
-	/// No elementsEquatable given but value changed
+	@Test("No elementsEquatable given but value changed")
 	func testChanges7() throws {
 		let oldSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "c")]
 		let newSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "d")]
@@ -114,12 +114,12 @@ final class SetExtensionTests: XCTestCase {
 		let delta = newSet.diff(to: oldSet)
 		let changes = newSet.compare(with: oldSet, elementsEquatable: { _,_ in return true })
 		
-		XCTAssert(delta.removed.isEmpty, "Result: \(delta.removed)")
-		XCTAssert(changes.isEmpty, "Result: \(changes)")
-		XCTAssert(delta.added.isEmpty, "Result: \(delta.added)")
+		#expect(delta.removed.isEmpty, "Result: \(delta.removed)")
+		#expect(changes.isEmpty, "Result: \(changes)")
+		#expect(delta.added.isEmpty, "Result: \(delta.added)")
 	}
 	
-	/// No elementsEquatable given but id changed
+	@Test("No elementsEquatable given but id changed")
 	func testChanges8() throws {
 		let oldSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 3, value: "c")]
 		let newSet: Set<TestType> = [TestType(id: 1, value: "a"), TestType(id: 2, value: "b"), TestType(id: 4, value: "c")]
@@ -127,8 +127,17 @@ final class SetExtensionTests: XCTestCase {
 		let delta = newSet.diff(to: oldSet)
 		let changes = newSet.compare(with: oldSet, elementsEquatable: { _,_ in return true })
 		
-		XCTAssert(changes.isEmpty, "Result: \(changes)")
-		XCTAssert(delta.added.contains(TestType(id: 4, value: "c")), "Result: \(delta.added)")
-		XCTAssert(delta.removed.contains(TestType(id: 3, value: "c")), "Result: \(delta.removed)")
+		#expect(changes.isEmpty, "Result: \(changes)")
+		#expect(delta.added.contains(TestType(id: 4, value: "c")), "Result: \(delta.added)")
+		#expect(delta.removed.contains(TestType(id: 3, value: "c")), "Result: \(delta.removed)")
+	}
+	
+	@Test("Test remove(where predicate: (Element) throws -> Bool) rethrows")
+	func testRemoveWhere() throws {
+		var set: Set<Int> = [1, 2, 3, 4, 5]
+		set.remove(where: { $0 > 2 })
+		
+		#expect(set.count == 2)
+		#expect(set == [1, 2])
 	}
 }

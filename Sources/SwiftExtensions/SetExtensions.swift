@@ -1,6 +1,14 @@
 import Foundation
 
 extension Set {
+	public mutating func remove(where predicate: (Element) throws -> Bool) rethrows {
+		for element in self {
+			if try predicate(element) {
+				self.remove(element)
+			}
+		}
+	}
+	
 	/// Update (or insert new) element based on update conditions.
 	///
 	/// The regular update function relies on the Hash of the Set elements. This function provides the capabilty to assert different conditions. Updating means that the element will be removed before the given element is being inserted.
