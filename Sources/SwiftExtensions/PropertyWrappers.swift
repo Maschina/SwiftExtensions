@@ -10,7 +10,7 @@ import Foundation
 import Combine
 
 @propertyWrapper
-public struct Clamp<V: Comparable & Codable & Hashable>: Codable, Hashable {
+public struct Clamp<V: Comparable & Codable & Hashable & Sendable>: Codable, Hashable, Sendable {
     var value: V
     let range: ClosedRange<V>
 	let precision: Int?
@@ -28,7 +28,7 @@ public struct Clamp<V: Comparable & Codable & Hashable>: Codable, Hashable {
 }
 
 @propertyWrapper
-public struct ClampFrom<V: Comparable & Codable & Hashable>: Codable, Hashable {
+public struct ClampFrom<V: Comparable & Codable & Hashable & Sendable>: Codable, Hashable, Sendable {
 	public static func == (lhs: ClampFrom<V>, rhs: ClampFrom<V>) -> Bool {
 		lhs.hashValue == rhs.hashValue
 	}
