@@ -159,7 +159,23 @@ extension LocalizedStringKey.StringInterpolation {
 }
 
 extension Shape {
-	public func fill<Fill: ShapeStyle, Stroke: ShapeStyle>(_ fillStyle: Fill, strokeBorder strokeStyle: Stroke, lineWidth: Double = 1, shadowRadius: CGFloat? = nil, shadowColor: Color = Color(.sRGBLinear, white: 0, opacity: 0.33), shadowX: CGFloat = 0, shadowY: CGFloat = 0) -> some View {
+	@MainActor
+	public func fill<
+		Fill: ShapeStyle,
+		Stroke: ShapeStyle
+	>(
+		_ fillStyle: Fill,
+		strokeBorder strokeStyle: Stroke,
+		lineWidth: Double = 1,
+		shadowRadius: CGFloat? = nil,
+		shadowColor: Color = Color(
+			.sRGBLinear,
+			white: 0,
+			opacity: 0.33
+		),
+		shadowX: CGFloat = 0,
+		shadowY: CGFloat = 0
+	) -> some View {
 		self
 			.stroke(strokeStyle, lineWidth: lineWidth)
 			.background(
@@ -173,7 +189,20 @@ extension Shape {
 	}
 	
 	/// fills and strokes a shape
-	public func fill<S: ShapeStyle>(_ fillContent: S, stroke: StrokeStyle, strokeColor: S, shadowRadius: CGFloat? = nil, shadowColor: Color = Color(.sRGBLinear, white: 0, opacity: 0.33), shadowX: CGFloat = 0, shadowY: CGFloat = 0) -> some View {
+	@MainActor
+	public func fill<S: ShapeStyle>(
+		_ fillContent: S,
+		stroke: StrokeStyle,
+		strokeColor: S,
+		shadowRadius: CGFloat? = nil,
+		shadowColor: Color = Color(
+			.sRGBLinear,
+			white: 0,
+			opacity: 0.33
+		),
+		shadowX: CGFloat = 0,
+		shadowY: CGFloat = 0
+	) -> some View {
 		ZStack {
 			self
 				.fill(fillContent)
@@ -248,7 +277,7 @@ extension Font {
 // MARK: Binding extension
 
 extension Binding {
-	public func toPresented<T>() -> Binding<Bool> where Value == Optional<T> {
+	public func toPresented<T: Sendable>() -> Binding<Bool> where Value == Optional<T> {
 		Binding<Bool> {
 			wrappedValue != nil
 		} set: {
@@ -260,9 +289,9 @@ extension Binding {
 	
 }
 
-extension Binding {
+extension Binding where Value: Sendable {
 	/// Wrapper to listen to didSet of Binding
-	func didSet(_ didSet: @escaping ((newValue: Value, oldValue: Value)) -> Void) -> Binding<Value> {
+	func didSet(_ didSet: @Sendable @escaping ((newValue: Value, oldValue: Value)) -> Void) -> Binding<Value> {
 		return .init(get: { self.wrappedValue }, set: { newValue in
 			let oldValue = self.wrappedValue
 			self.wrappedValue = newValue
@@ -271,7 +300,7 @@ extension Binding {
 	}
 	
 	/// Wrapper to listen to willSet of Binding
-	func willSet(_ willSet: @escaping ((newValue: Value, oldValue: Value)) -> Bool) -> Binding<Value> {
+	func willSet(_ willSet: @Sendable @escaping ((newValue: Value, oldValue: Value)) -> Bool) -> Binding<Value> {
 		return .init(get: { self.wrappedValue }, set: { newValue in
 			if willSet((newValue, self.wrappedValue)) {
 				self.wrappedValue = newValue

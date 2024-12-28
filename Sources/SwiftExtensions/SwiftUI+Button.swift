@@ -8,7 +8,7 @@
 import SwiftUI
 
 extension Button where Label == Image {
-	public init(systemImage: String, action: @escaping () -> Void) {
+	public init(systemImage: String, action: sending @escaping () -> Void) {
 		self.init {
 			action()
 		} label: {
@@ -18,7 +18,7 @@ extension Button where Label == Image {
 }
 
 extension Button where Label == Text {
-	public init(_ titleKey: LocalizedStringKey, action: @escaping @MainActor () async -> Void) {
+	public init(_ titleKey: LocalizedStringKey, action: sending @escaping @MainActor () async -> Void) {
 		self.init(titleKey) {
 			Task {
 				await action()
@@ -26,7 +26,7 @@ extension Button where Label == Text {
 		}
 	}
 	
-	public init(_ titleKey: LocalizedStringKey, role: ButtonRole?, action: @escaping @MainActor () async -> Void) {
+	public init(_ titleKey: LocalizedStringKey, role: ButtonRole?, action: sending @escaping @MainActor () async -> Void) {
 		self.init(titleKey, role: role) {
 			Task {
 				await action()
@@ -36,7 +36,7 @@ extension Button where Label == Text {
 }
 
 extension Button {
-	public init(action: @escaping @MainActor () async -> Void, @ViewBuilder label: () -> Label) {
+	public init(action: sending @escaping @MainActor () async -> Void, @ViewBuilder label: () -> Label) {
 		self.init {
 			Task {
 				await action()
@@ -48,7 +48,7 @@ extension Button {
 }
 
 extension Button where Label == SwiftUI.Label<Text, Image> {
-	public init(_ titleKey: LocalizedStringKey, systemImage: String, action: @escaping @MainActor () async -> Void) {
+	public init(_ titleKey: LocalizedStringKey, systemImage: String, action: sending @escaping @MainActor () async -> Void) {
 		self.init(titleKey, systemImage: systemImage) {
 			Task {
 				await action()

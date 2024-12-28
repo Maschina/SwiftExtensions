@@ -55,29 +55,29 @@ public extension Publisher {
 
 @available(iOS 13.0, *)
 @available(macOS 10.15, *)
-public extension Publisher {
+public extension Publisher where Self.Output: Sendable {
 	/// Freely call any non-throwing async function within a Combine pipeline
 	/// - Returns: Continued publisher stream
-	func asyncMap<T>(_ transform: @escaping (Self.Output) async -> T) -> Publishers.FlatMap<Future<T, Never>, Self> {
-		flatMap { value in
-			Future { promise in
-				Task {
-					let output = await transform(value)
-					promise(.success(output))
-				}
-			}
-		}
-	}
+//	func asyncMap<T: Sendable>(_ transform: @Sendable @escaping (Self.Output) async -> T) -> Publishers.FlatMap<Future<T, Never>, Self> {
+//		flatMap { value in
+//			Future { promise in
+//				Task { @Sendable [value] in
+//					let output = await transform(value)
+//					promise(.success(output))
+//				}
+//			}
+//		}
+//	}
 	
 	/// Attaches a concurrent Task-driven subscriber with closure-based behavior.
 	/// - parameter receiveComplete: The closure to execute on completion.
 	/// - parameter receiveValue: The closure to be awaited to execute within a concurrent Task on receipt of a value.
 	/// - Returns: A cancellable instance, which you use when you end assignment of the received value. Deallocation of the result will tear down the subscription stream.
-	func sink<T>(taskPriority: TaskPriority? = nil, receiveCompletion: @escaping ((Subscribers.Completion<Self.Failure>) -> Void), receiveValue: @escaping ((Self.Output) async -> T)) -> AnyCancellable {
+	func sink<T: Sendable>(taskPriority: TaskPriority? = nil, receiveCompletion: @escaping ((Subscribers.Completion<Self.Failure>) -> Void), receiveValue: @Sendable @escaping (Self.Output) async -> T) -> AnyCancellable {
 		sink { completion in
 			receiveCompletion(completion)
 		} receiveValue: { value in
-			Task(priority: taskPriority) {
+			Task(priority: taskPriority) { 
 				await receiveValue(value)
 			}
 		}
@@ -87,7 +87,7 @@ public extension Publisher {
 	/// - parameter receiveComplete: The closure to be awaited to execute within a concurrent Task on completion.
 	/// - parameter receiveValue: The closure to be awaited to execute within a concurrent Task on receipt of a value.
 	/// - Returns: A cancellable instance, which you use when you end assignment of the received value. Deallocation of the result will tear down the subscription stream.
-	func sink<T>(receiveCompletion: @escaping ((Subscribers.Completion<Self.Failure>) async -> Void), receiveValue: @escaping ((Self.Output) async -> T)) -> AnyCancellable {
+	func sink<T: Sendable>(receiveCompletion: @Sendable @escaping (Subscribers.Completion<Self.Failure>) async -> Void, receiveValue: @Sendable @escaping (Self.Output) async -> T) -> AnyCancellable {
 		sink { completion in
 			Task {
 				await receiveCompletion(completion)
@@ -103,7 +103,7 @@ public extension Publisher {
 	/// Performs the specified closures when publisher events occur.
 	/// - Parameters:
 	///   - receiveOutput: An optional closure to be awaited to execute within a concurrent Task when the publisher receives a value from the upstream publisher. This value defaults to `nil`.
-	func handleReceivedOutputEvent(_ receiveOutput: @escaping ((Self.Output) async -> Void)) -> Publishers.HandleEvents<Self> {
+	func handleReceivedOutputEvent(_ receiveOutput: @Sendable @escaping (Self.Output) async -> Void) -> Publishers.HandleEvents<Self> {
 		handleEvents(receiveOutput: { output in
 			Task {
 				await receiveOutput(output)
@@ -114,13 +114,13 @@ public extension Publisher {
 
 @available(iOS 13.0, *)
 @available(macOS 10.15, *)
-public extension Publisher where Self.Failure == Never {
+public extension Publisher where Self.Failure == Never, Self.Output: Sendable {
 	/// Attaches a concurrent Task-driven subscriber with closure-based behavior to a publisher that never fails.
 	/// - parameter receiveValue: The closure to be awaited to execute within a concurrent Task on receipt of a value.
 	/// - Returns: A cancellable instance, which you use when you end assignment of the received value. Deallocation of the result will tear down the subscription stream.
-	func sink<T>(receiveValue: @escaping (Self.Output) async -> T) -> AnyCancellable {
+	func sink<T: Sendable>(receiveValue: @Sendable @escaping (Self.Output) async -> T) -> AnyCancellable {
 		sink { value in
-			Task {
+			Task { 
 				await receiveValue(value)
 			}
 		}
