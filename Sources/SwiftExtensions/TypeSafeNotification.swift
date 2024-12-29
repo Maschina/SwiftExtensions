@@ -2,11 +2,6 @@
 //  TypeSafeNotification.swift
 //  SwiftExtensions
 //
-//  Created by Robert Hahn on 29.12.24.
-//
-
-
-// Copyright (C) 2023 Robert Hahn. All Rights Reserved.
 
 import SwiftUI
 import Combine
@@ -27,7 +22,7 @@ import Combine
 /// # Observe notifications
 /// `NotificationCenter.default.addObserver(for: .customNotification, ...)`
 public struct TypeSafeNotification<T: Sendable>: Sendable {
-	let name: NSNotification.Name
+	public let name: NSNotification.Name
 }
 
 public enum NotificationData<T: Sendable>: Sendable {
