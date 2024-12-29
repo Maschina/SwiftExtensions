@@ -23,6 +23,10 @@ import Combine
 /// `NotificationCenter.default.addObserver(for: .customNotification, ...)`
 public struct TypeSafeNotification<T: Sendable>: Sendable {
 	public let name: NSNotification.Name
+	
+	public init(name: NSNotification.Name) {
+		self.name = name
+	}
 }
 
 public enum NotificationData<T: Sendable>: Sendable {
