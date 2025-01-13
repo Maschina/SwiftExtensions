@@ -8,7 +8,7 @@
 import SwiftUI
 
 extension Button where Label == Image {
-	public init(systemImage: String, action: sending @escaping () -> Void) {
+	public init(systemImage: String, action: sending @escaping @MainActor () -> Void) {
 		self.init {
 			action()
 		} label: {
@@ -55,4 +55,16 @@ extension Button where Label == SwiftUI.Label<Text, Image> {
 			}
 		}
 	}
+}
+
+#Preview {
+	@MainActor
+	func printOnMain(_ message: String) {
+		print(message)
+	}
+	
+	return Button(systemImage: "info.circle") {
+		printOnMain("hello")
+	}
+	.padding()
 }
