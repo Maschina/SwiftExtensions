@@ -58,6 +58,10 @@ extension String {
 		}
 		return false
 	}
+	
+	@inlinable public var isNotEmpty: Bool {
+		!self.isEmpty
+	}
 }
 
 
