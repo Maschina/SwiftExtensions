@@ -59,7 +59,7 @@ extension String {
 		return false
 	}
 	
-	@inlinable public var isNotEmpty: Bool {
+	@inlinable public var containsText: Bool {
 		!self.isEmpty
 	}
 }
