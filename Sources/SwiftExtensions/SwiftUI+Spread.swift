@@ -35,14 +35,14 @@ extension View {
 				
 			case .leading:
 				HStack(alignment: vAlignment) {
-					self
 					Spacer(minLength: 0)
+					self
 				}
 				
 			case .trailing:
 				HStack(alignment: vAlignment) {
-					Spacer(minLength: 0)
 					self
+					Spacer(minLength: 0)
 				}
 				
 			case .vertical:
@@ -54,14 +54,14 @@ extension View {
 				
 			case .top:
 				VStack(alignment: hAlignment) {
-					self
 					Spacer(minLength: 0)
+					self
 				}
 				
 			case .bottom:
 				VStack(alignment: hAlignment) {
-					Spacer(minLength: 0)
 					self
+					Spacer(minLength: 0)
 				}
 		}
 	}
