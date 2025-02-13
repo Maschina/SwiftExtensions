@@ -81,3 +81,11 @@ extension Set {
 		return values
 	}
 }
+
+// Operator extensions
+
+extension Set {
+	public static func +<S: Sequence>(lhs: Self, rhs: S) -> Self where S.Element == Element {
+		lhs.union(rhs)
+	}
+}

@@ -140,4 +140,17 @@ struct SetExtensionTests {
 		#expect(set.count == 2)
 		#expect(set == [1, 2])
 	}
+	
+	@Test("Operator extension for +")
+	func testOperatorExtensionPlus() {
+		let set1: Set<Int> = [1, 2, 3, 4, 5]
+		let set2: Set<Int> = [1, 2, 3, 4, 5]
+		let set3: Set<Int> = [6, 7, 8]
+		
+		let union1 = set1 + set2
+		#expect(union1.count == 5, "Should not count more than 5")
+		
+		let union2 = set1 + set3
+		#expect(union2.count == 8, "Should not count more than 8")
+	}
 }
