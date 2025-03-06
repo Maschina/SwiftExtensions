@@ -270,9 +270,17 @@ extension Array where Element: Hashable {
         return IndexSet(elements)
     }
 	
-//	public func overlap(with: [Element]) -> [Int] {
-//		self.enumerated().compactMap({ (index, element) in with.contains(element) ? index : nil })
-//	}
+	mutating public func formUnion(_ other: [Element]) {
+		var current = Set(self)
+		current.formUnion(other)
+		self = Array(current)
+	}
+	
+	public func formUnioned(_ other: [Element]) -> [Element] {
+		var current = Set(self)
+		current.formUnion(other)
+		return Array(current)
+	}
 }
 
 
