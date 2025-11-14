@@ -298,3 +298,36 @@ extension Color {
 		self.init(.sRGB, red: red, green: green, blue: blue, opacity: opacity)
 	}
 }
+
+extension MultiplatformColor {
+#if os(macOS)
+	func resolvedOSColor(colorScheme: ColorScheme? = nil) -> MultiplatformColor {
+		var currentCGColor: CGColor = cgColor
+		let appearance: NSAppearance? = {
+			guard let colorScheme else {
+				return nil
+			}
+			return NSAppearance(named: colorScheme == .dark ? .darkAqua : .aqua)
+		}()
+
+		(appearance ?? NSAppearance.currentDrawing()).performAsCurrentDrawingAppearance {
+			currentCGColor = cgColor
+		}
+
+		return MultiplatformColor(cgColor: currentCGColor) ?? .clear
+	}
+#endif
+
+#if os(iOS)
+	func resolvedOSColor(colorScheme: ColorScheme? = nil) -> MultiplatformColor {
+		let traitCollection: UITraitCollection? = {
+			guard let colorScheme else {
+				return nil
+			}
+			return UITraitCollection(userInterfaceStyle: colorScheme == .dark ? .dark : .light)
+		}()
+
+		return resolvedColor(with: traitCollection ?? UITraitCollection.current)
+	}
+#endif
+}

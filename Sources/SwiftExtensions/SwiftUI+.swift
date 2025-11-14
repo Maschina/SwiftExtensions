@@ -229,41 +229,90 @@ extension Color {
 	public var bestContrastColor: Color {
 		self.bestContrastColor()
 	}
-	
+
 	/// This color is either black or white, whichever is more accessible when viewed against the scrum color.
-	public func bestContrastColor(in colorSpace: NSColorSpace = .deviceRGB) -> Color {
+	/// Uses WCAG contrast ratio guidelines for proper contrast determination.
+	/// - Parameter colorScheme: Optional ColorScheme for SwiftUI contexts (light/dark mode detection)
+	/// - Parameter colorSpace: NSColorSpace for color conversion
+	public func bestContrastColor(colorScheme: ColorScheme? = nil, in colorSpace: NSColorSpace = .deviceRGB) -> Color {
 		var red: CGFloat = 0
 		var green: CGFloat = 0
 		var blue: CGFloat = 0
+		var alpha: CGFloat = 1
 #if os(iOS)
 		guard let rgbColor = UIColor(self).usingColorSpace(colorSpace) else { return Color.primary }
-		rgbColor.getRed(&red, green: &green, blue: &blue, alpha: nil)
+		rgbColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
 #elseif os(macOS)
 		guard let rgbColor = NSColor(self).usingColorSpace(colorSpace) else { return Color.primary }
-		rgbColor.getRed(&red, green: &green, blue: &blue, alpha: nil)
+		rgbColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
 #endif
-		return isLightColor(red: red, green: green, blue: blue) ? .black : .white
+		let baseIsLight = isLightColor(red: red, green: green, blue: blue, alpha: alpha, colorScheme: colorScheme)
+
+		// Return black for light backgrounds and white for dark backgrounds
+		// to achieve maximum contrast
+		return baseIsLight ? .black : .white
 	}
-	
+
 	/// This color is either black or white, whichever is more accessible when viewed against the scrum color.
 	@available(*, deprecated, renamed: "bestContrastColor")
 	public var accessibleFontColor: Color {
 		self.bestContrastColor()
 	}
-	
+
 	/// This color is either black or white, whichever is more accessible when viewed against the scrum color.
 	@available(*, deprecated, renamed: "bestContrastColor(in:)")
 	public func accessibleFontColor(in colorSpace: NSColorSpace = .deviceRGB) -> Color {
 		bestContrastColor(in: colorSpace)
 	}
-	
-	private func isLightColor(red: CGFloat, green: CGFloat, blue: CGFloat) -> Bool {
-		let lightRed = red > 0.65
-		let lightGreen = green > 0.65
-		let lightBlue = blue > 0.65
-		
-		let lightness = [lightRed, lightGreen, lightBlue].reduce(0) { $1 ? $0 + 1 : $0 }
-		return lightness >= 2
+
+	/// Determines if a color is light or dark based on WCAG relative luminance calculation.
+	/// Considers alpha value by blending with the current appearance's background (light/dark mode aware).
+	/// - Parameter colorScheme: Optional SwiftUI ColorScheme for reliable appearance detection
+	/// - Returns: `true` if the color is light (relative luminance > 0.5), `false` if dark
+	private func isLightColor(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat, colorScheme: ColorScheme?) -> Bool {
+		// Convert sRGB color components to linear RGB using WCAG gamma correction
+		// https://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef
+		func linearize(_ component: CGFloat) -> CGFloat {
+			if component <= 0.03928 {
+				return component / 12.92
+			} else {
+				return pow((component + 0.055) / 1.055, 2.4)
+			}
+		}
+
+		// Apply gamma correction to each channel
+		let r = linearize(red)
+		let g = linearize(green)
+		let b = linearize(blue)
+
+		// Calculate relative luminance using WCAG formula
+		let luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+		// Determine background luminance based on current appearance
+		// In light mode, background is white (1.0); in dark mode, background is black (0.0)
+		let backgroundLuminance: CGFloat
+
+		// Prefer SwiftUI's colorScheme if provided (most reliable in SwiftUI contexts)
+		if let colorScheme = colorScheme {
+			backgroundLuminance = (colorScheme == .dark) ? 0.0 : 1.0
+		} else {
+#if os(macOS)
+			// Fallback to AppKit appearance detection
+			let appearance = NSAppearance.currentDrawing()
+			let isDarkMode = appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
+			backgroundLuminance = isDarkMode ? 0.0 : 1.0
+#else
+			backgroundLuminance = 1.0 // iOS default - light mode
+#endif
+		}
+
+		// Blend with appropriate background based on alpha to account for transparency
+		// effectiveLuminance = foreground * alpha + background * (1 - alpha)
+		let effectiveLuminance = luminance * alpha + backgroundLuminance * (1.0 - alpha)
+
+		// A luminance threshold of 0.5 provides good contrast distinction
+		// Values above 0.5 are considered light and need dark text
+		return effectiveLuminance > 0.5
 	}
 }
 
