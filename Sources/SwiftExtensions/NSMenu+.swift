@@ -77,12 +77,24 @@ extension NSMenu {
 		self.addItem(NSMenuItem.separator())
 	}
 	
-	@available(macOS 14.0, *)
 	public func addHeader(
 		withTitle string: String,
 		image: NSImage? = nil
 	) {
-		let item = NSMenuItem.sectionHeader(title: string)
+		let item: NSMenuItem
+		if #available(macOS 14.0, *) {
+			item = NSMenuItem.sectionHeader(title: string)
+		} else {
+			// Fallback on earlier versions
+			item = NSMenuItem.init(title: string)
+			let font = NSFont.boldSystemFont(ofSize: NSFont.smallSystemFontSize)
+			let color = NSColor.secondaryLabelColor
+			let attributes: [NSAttributedString.Key: Any] = [
+				.font: font,
+				.foregroundColor: color
+			]
+			item.attributedTitle = NSAttributedString(string: string, attributes: attributes)
+		}
 		item.isEnabled = false
 		if let image {
 			item.image = image

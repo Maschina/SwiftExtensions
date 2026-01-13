@@ -234,7 +234,7 @@ extension Color {
 	/// Uses WCAG contrast ratio guidelines for proper contrast determination.
 	/// - Parameter colorScheme: Optional ColorScheme for SwiftUI contexts (light/dark mode detection)
 	/// - Parameter colorSpace: NSColorSpace for color conversion
-	public func bestContrastColor(colorScheme: ColorScheme? = nil, in colorSpace: NSColorSpace = .deviceRGB) -> Color {
+	public func bestContrastColor(colorScheme: ColorScheme? = nil, in colorSpace: NSColorSpace = .sRGB) -> Color {
 		var red: CGFloat = 0
 		var green: CGFloat = 0
 		var blue: CGFloat = 0
@@ -312,7 +312,7 @@ extension Color {
 
 		// A luminance threshold of 0.5 provides good contrast distinction
 		// Values above 0.5 are considered light and need dark text
-		return effectiveLuminance > 0.5
+		return effectiveLuminance > 0.4
 	}
 }
 

@@ -331,3 +331,42 @@ extension MultiplatformColor {
 	}
 #endif
 }
+
+extension Array where Element == MultiplatformColor {
+    public var averageColor: MultiplatformColor {
+        // Average the RGBA components of colorsTurnedOn in sRGB color space
+        guard !self.isEmpty else { return .clear }
+
+        var totalR: CGFloat = 0
+        var totalG: CGFloat = 0
+        var totalB: CGFloat = 0
+        var totalA: CGFloat = 0
+
+        for element in self {
+            // Convert to sRGB to ensure consistent component extraction
+            let color = element.usingColorSpace(.sRGB) ?? element
+            var r: CGFloat = 0
+            var g: CGFloat = 0
+            var b: CGFloat = 0
+            var a: CGFloat = 0
+            color.getRed(&r, green: &g, blue: &b, alpha: &a)
+            totalR += r
+            totalG += g
+            totalB += b
+            totalA += a
+        }
+
+        let count = CGFloat(self.count)
+        let avgR = totalR / count
+        let avgG = totalG / count
+        let avgB = totalB / count
+        let avgA = totalA / count
+
+        return MultiplatformColor(
+            red: avgR,
+            green: avgG,
+            blue: avgB,
+            alpha: avgA
+        )
+    }
+}
