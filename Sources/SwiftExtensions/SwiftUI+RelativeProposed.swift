@@ -2,7 +2,8 @@ import SwiftUI
 
 extension View {
 	/// Proposes a percentage of its received proposed size to `self`.
-	@available(macOS 13.0, *)
+    @available(iOS 16.0, *)
+    @available(macOS 13.0, *)
 	public func relativeProposed(width: Double = 1, height: Double = 1) -> some View {
 		RelativeSizeLayout(relativeWidth: width, relativeHeight: height) {
 			// Wrap content view in a container to make sure the layout only
@@ -18,12 +19,13 @@ extension View {
 /// received proposed size to its subview.
 ///
 /// - Precondition: must contain exactly one subview.
+@available(iOS 16.0, *)
 @available(macOS 13.0, *)
 fileprivate struct RelativeSizeLayout: Layout {
 	var relativeWidth: Double
 	var relativeHeight: Double
 
-	func sizeThatFits(
+    func sizeThatFits(
 		proposal: ProposedViewSize,
 		subviews: Subviews,
 		cache: inout ()

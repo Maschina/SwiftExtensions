@@ -52,7 +52,8 @@ extension Task where Failure == Error {
 	///     Pass `nil` to use the priority from `Task.currentPriority`.
 	///   - timeout: The duration in seconds `operation` is allowed to run before timing out.
 	///   - operation: The operation to perform.
-	@available(macOS 13.0, *)
+    @available(iOS 16.0, *)
+    @available(macOS 13.0, *)
 	@discardableResult
 	public init(
 		priority: TaskPriority? = nil,

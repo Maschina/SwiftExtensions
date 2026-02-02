@@ -1,9 +1,9 @@
 import Foundation
-import AppKit.NSWorkspace
 import UniformTypeIdentifiers
 
 extension URL {
-	@available(macOS 13.0, *)
+    @available(iOS 16.0, *)
+    @available(macOS 13.0, *)
 	public var ipAddress: String? {
 		let regex = /([0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3})/
 		do {
@@ -15,15 +15,12 @@ extension URL {
 		}
 	}
 	
-	@available(macOS 13.0, *)
+    @available(iOS 16.0, *)
+    @available(macOS 13.0, *)
 	public var hasIpAddress: Bool {
 		let regex = /[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}/
 		guard let host = self.host() else { return false }
 		return host.firstMatch(of: regex) != nil
-	}
-	
-	public func open() {
-		NSWorkspace.shared.open(self)
 	}
 	
 	public var mimeType: String {
@@ -35,3 +32,27 @@ extension URL {
 		}
 	}
 }
+
+#if canImport(AppKit)
+
+import AppKit
+
+extension URL {
+    public func open() {
+        NSWorkspace.shared.open(self)
+    }
+}
+
+#endif
+
+#if canImport(UIKit)
+
+import UIKit
+
+extension URL {
+    public func open() {
+        UIApplication.shared.open(self)
+    }
+}
+
+#endif

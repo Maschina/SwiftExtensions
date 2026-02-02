@@ -234,24 +234,35 @@ extension Color {
 	/// Uses WCAG contrast ratio guidelines for proper contrast determination.
 	/// - Parameter colorScheme: Optional ColorScheme for SwiftUI contexts (light/dark mode detection)
 	/// - Parameter colorSpace: NSColorSpace for color conversion
+#if os(macOS)
 	public func bestContrastColor(colorScheme: ColorScheme? = nil, in colorSpace: NSColorSpace = .sRGB) -> Color {
 		var red: CGFloat = 0
 		var green: CGFloat = 0
 		var blue: CGFloat = 0
 		var alpha: CGFloat = 1
-#if os(iOS)
-		guard let rgbColor = UIColor(self).usingColorSpace(colorSpace) else { return Color.primary }
-		rgbColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-#elseif os(macOS)
 		guard let rgbColor = NSColor(self).usingColorSpace(colorSpace) else { return Color.primary }
 		rgbColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-#endif
 		let baseIsLight = isLightColor(red: red, green: green, blue: blue, alpha: alpha, colorScheme: colorScheme)
 
 		// Return black for light backgrounds and white for dark backgrounds
 		// to achieve maximum contrast
 		return baseIsLight ? .black : .white
 	}
+#elseif os(iOS)
+    public func bestContrastColor(colorScheme: ColorScheme? = nil) -> Color {
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 1
+        let rgbColor = UIColor(self)
+        rgbColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        let baseIsLight = isLightColor(red: red, green: green, blue: blue, alpha: alpha, colorScheme: colorScheme)
+
+        // Return black for light backgrounds and white for dark backgrounds
+        // to achieve maximum contrast
+        return baseIsLight ? .black : .white
+    }
+#endif
 
 	/// This color is either black or white, whichever is more accessible when viewed against the scrum color.
 	@available(*, deprecated, renamed: "bestContrastColor")
@@ -259,11 +270,13 @@ extension Color {
 		self.bestContrastColor()
 	}
 
+#if os(macOS)
 	/// This color is either black or white, whichever is more accessible when viewed against the scrum color.
 	@available(*, deprecated, renamed: "bestContrastColor(in:)")
 	public func accessibleFontColor(in colorSpace: NSColorSpace = .deviceRGB) -> Color {
 		bestContrastColor(in: colorSpace)
 	}
+#endif
 
 	/// Determines if a color is light or dark based on WCAG relative luminance calculation.
 	/// Considers alpha value by blending with the current appearance's background (light/dark mode aware).

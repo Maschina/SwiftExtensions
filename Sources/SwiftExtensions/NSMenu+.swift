@@ -1,9 +1,4 @@
-//
-//  File.swift
-//
-//
-//  Created by Robert Hahn on 22.10.23.
-//
+#if canImport(AppKit)
 
 import AppKit
 
@@ -144,3 +139,5 @@ public class ActionMenuItem: NSMenuItem {
 		closure?(sender)
 	}
 }
+
+#endif

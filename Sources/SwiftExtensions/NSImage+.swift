@@ -1,9 +1,4 @@
-//
-//  File.swift
-//  
-//
-//  Created by Robert Hahn on 23.10.23.
-//
+#if canImport(AppKit)
 
 import AppKit
 
@@ -12,3 +7,5 @@ extension NSImage {
 		self.init(systemSymbolName: systemSymbolName, accessibilityDescription: nil)
 	}
 }
+
+#endif

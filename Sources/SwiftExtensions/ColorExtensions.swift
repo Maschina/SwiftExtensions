@@ -344,7 +344,11 @@ extension Array where Element == MultiplatformColor {
 
         for element in self {
             // Convert to sRGB to ensure consistent component extraction
+            #if os(macOS)
             let color = element.usingColorSpace(.sRGB) ?? element
+            #elseif os(iOS)
+            let color = element
+            #endif
             var r: CGFloat = 0
             var g: CGFloat = 0
             var b: CGFloat = 0
