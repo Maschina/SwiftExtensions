@@ -224,7 +224,7 @@ extension Array where Element: Hashable {
 		let lenChanges = IndexPath(indexes: Swift.min(self.count, previous.count)..<Swift.max(self.count, previous.count))
 		let inserts = self.count > previous.count ? lenChanges : []
 		let deletes = self.count < previous.count ? lenChanges : []
-		return (changes: changes, inserts: inserts, deletes: deletes)
+		return (changes: IndexPath(indexes: changes), inserts: inserts, deletes: deletes)
 	}
 	
     public func removingDuplicates() -> [Element] {
